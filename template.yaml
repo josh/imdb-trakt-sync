@@ -1,0 +1,14 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  imdb-trakt-sync:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: Sync IMDb to Trakt
+      Handler: index.handler
+      Runtime: nodejs6.10
+      Timeout: 30
+      Code:
+        Files:
+          - index.js
+          - node_modules/

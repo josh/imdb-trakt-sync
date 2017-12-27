@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "csv": "^2.0.0",
+    "node-fetch": "^1.7.3"
+  }
+}
