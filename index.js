@@ -211,8 +211,6 @@ function sync() {
   return Promise.all([syncWatchlist(), syncRatings()]);
 }
 
-exports.handler = (event, context, callback) => {
-  sync()
-    .then(result => callback(null, result))
-    .catch(error => callback(error));
+exports.handler = () => {
+  return sync();
 };
