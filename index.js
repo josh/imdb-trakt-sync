@@ -57,7 +57,7 @@ function imdbRatings() {
     `http://www.imdb.com/user/${process.env.IMDB_RATINGS_ID}/ratings/export`,
     {
       headers: {
-        Cookie: `id=${process.env.IMDB_SESSION_ID}`
+        Cookie: `id=${process.env.IMDB_ID}; sid=${process.env.IMDB_SID}`
       }
     }
   )
