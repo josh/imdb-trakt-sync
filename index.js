@@ -208,7 +208,47 @@ function syncRatings() {
 }
 
 function sync() {
-  return Promise.all([syncWatchlist(), syncRatings()]);
+  return Promise.all([syncWatchlist(), syncRatings()]).then(summary);
+}
+
+function changeSummary(result) {
+  const summary = [];
+
+  for (const key in result) {
+    const changes = result[key];
+    const message = [];
+    for (const key in changes) {
+      const change = changes[key];
+      if (typeof change === "number") {
+        if (change > 0) message.push(`${change} ${key}`);
+      } else if (typeof change === "object") {
+        if (change.length > 0) message.push(JSON.stringify(change));
+      }
+    }
+
+    if (message.length) summary.push(`${key}: ${message.join(", ")}`);
+  }
+
+  return summary.length > 0 ? summary.join(", ") : "no change";
+}
+
+function summary(result) {
+  try {
+    const [watchlist, ratings] = result;
+    const [watchlistAdded, watchListDeleted] = watchlist;
+    const [ratingsRate, ratingsWatch, ratingsUnrate, ratingsUnwatch] = ratings;
+
+    return [
+      `watchlist.added: ${changeSummary(watchlistAdded)}`,
+      `watchlist.deleted: ${changeSummary(watchListDeleted)}`,
+      `ratings.rate: ${changeSummary(ratingsRate)}`,
+      `ratings.unrate: ${changeSummary(ratingsUnrate)}`,
+      `ratings.watch: ${changeSummary(ratingsWatch)}`,
+      `ratings.unwatch: ${changeSummary(ratingsUnwatch)}`
+    ].join("\n");
+  } catch (error) {
+    return `summary error: ${JSON.stringify(result)}`;
+  }
 }
 
 exports.handler = () => {
