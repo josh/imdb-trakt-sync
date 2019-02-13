@@ -1,7 +1,6 @@
 {
   "private": true,
   "scripts": {
-    "start": "node ./start.js",
     "test": "echo"
   },
   "dependencies": {

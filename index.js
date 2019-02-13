@@ -246,6 +246,6 @@ function summary(watchlist, ratings) {
   }
 }
 
-exports.handler = () => {
-  return sync();
-};
+(async function() {
+  console.log(await sync());
+})();
