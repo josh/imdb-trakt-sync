@@ -1,17 +1,24 @@
-FROM node:8.10
+FROM alpine:latest
+
+RUN apk add --no-cache \
+  bash \
+  ca-certificates \
+  curl \
+  jq \
+  nodejs \
+  npm \
+  wget
 
 RUN wget -O /usr/bin/tickerd https://github.com/josh/tickerd/releases/latest/download/tickerd-linux-amd64 && chmod +x /usr/bin/tickerd
 
-RUN mkdir -p /usr/src/app
-WORKDIR /usr/src/app
+WORKDIR /app
+RUN npm install csv@2.0.0
+RUN npm install node-fetch@1.7.3
+COPY . .
 
-ENV NODE_ENV production
-COPY package.json package-lock.json /usr/src/app/
-RUN npm install && npm cache clean --force
-COPY . /usr/src/app
+ENTRYPOINT [ "/usr/bin/tickerd", "--" ]
+CMD [ "/app/main.sh" ]
 
-ENTRYPOINT [ "/usr/bin/tickerd", "--", "node", "./index.js" ]
-
-ENV TICKERD_HEALTHCHECK_FILE "/var/log/healthcheck"
+ENV TICKERD_HEALTHCHECK_FILE "/var/run/healthcheck"
 HEALTHCHECK --interval=1m --timeout=3s --start-period=3s --retries=1 \
   CMD [ "/usr/bin/tickerd", "-healthcheck" ]
