@@ -1,7 +1,12 @@
-FROM node:8.10-alpine
+FROM alpine:latest
 
 RUN apk add --no-cache \
+  bash \
   ca-certificates \
+  curl \
+  jq \
+  nodejs \
+  npm \
   wget
 
 RUN wget -O /usr/bin/tickerd https://github.com/josh/tickerd/releases/latest/download/tickerd-linux-amd64 && chmod +x /usr/bin/tickerd
