@@ -12,6 +12,6 @@ COPY . /usr/src/app
 
 ENTRYPOINT [ "/usr/bin/tickerd", "--", "node", "./index.js" ]
 
-ENV TICKERD_HEALTHCHECK_FILE "/var/log/healthcheck"
+ENV TICKERD_HEALTHCHECK_FILE "/var/run/healthcheck"
 HEALTHCHECK --interval=1m --timeout=3s --start-period=3s --retries=1 \
   CMD [ "/usr/bin/tickerd", "-healthcheck" ]
