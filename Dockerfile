@@ -17,7 +17,7 @@ RUN npm install node-fetch@1.7.3
 COPY . .
 
 ENTRYPOINT [ "/usr/bin/tickerd", "--" ]
-CMD [ "node", "./index.js" ]
+CMD [ "/app/main.sh" ]
 
 ENV TICKERD_HEALTHCHECK_FILE "/var/run/healthcheck"
 HEALTHCHECK --interval=1m --timeout=3s --start-period=3s --retries=1 \
