@@ -124,7 +124,9 @@ function traktUnwatch(movies) {
 }
 
 async function syncWatchlist(imdbWatchlistFilename) {
-  const imdbWatchlistPromise = JSON.parse(fs.readFileSync(imdbWatchlistFilename, "utf8"));
+  const imdbWatchlistPromise = JSON.parse(
+    fs.readFileSync(imdbWatchlistFilename, "utf8")
+  );
   const traktWatchlistPromise = traktWatchlist();
   const { add, remove } = diff(
     await imdbWatchlistPromise,
@@ -135,7 +137,9 @@ async function syncWatchlist(imdbWatchlistFilename) {
 }
 
 async function syncRatings(imdbRatingsFilename) {
-  const imdbRatingsPromise = JSON.parse(fs.readFileSync(imdbRatingsFilename, "utf8"));
+  const imdbRatingsPromise = JSON.parse(
+    fs.readFileSync(imdbRatingsFilename, "utf8")
+  );
   const traktRatingsPromise = traktRatings();
   const { add, remove } = diff(
     await imdbRatingsPromise,
