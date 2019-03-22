@@ -13,7 +13,10 @@ usage() {
 [ -n "$TRAKT_ACCESS_TOKEN" ] || usage
 [ -n "$TRAKT_CLIENT_ID" ] || usage
 
-set -ex
+set -euxo pipefail
 
-node ./index.js watchlist
-node ./index.js ratings
+node ./imdb-watchlist.js | tee imdb-watchlist.json
+node ./imdb-ratings.js | tee imdb-ratings.json
+
+node ./index.js watchlist imdb-watchlist.json
+node ./index.js ratings imdb-ratings.json
