@@ -201,12 +201,6 @@ async function syncRatings() {
   ]);
 }
 
-async function sync() {
-  const syncWatchlistPromise = syncWatchlist();
-  const syncRatingsPromise = syncRatings();
-  return summary(await syncWatchlistPromise, await syncRatingsPromise);
-}
-
 function changeSummary(result) {
   const summary = [];
 
@@ -228,24 +222,30 @@ function changeSummary(result) {
   return summary.length > 0 ? summary.join(", ") : "no change";
 }
 
-function summary(watchlist, ratings) {
-  try {
-    const [watchlistAdded, watchListDeleted] = watchlist;
-    const [ratingsRate, ratingsWatch, ratingsUnrate, ratingsUnwatch] = ratings;
-
-    return [
-      `watchlist.added: ${changeSummary(watchlistAdded)}`,
-      `watchlist.deleted: ${changeSummary(watchListDeleted)}`,
-      `ratings.rate: ${changeSummary(ratingsRate)}`,
-      `ratings.unrate: ${changeSummary(ratingsUnrate)}`,
-      `ratings.watch: ${changeSummary(ratingsWatch)}`,
-      `ratings.unwatch: ${changeSummary(ratingsUnwatch)}`
-    ].join("\n");
-  } catch (error) {
-    return `summary error: ${JSON.stringify(result)}`;
-  }
-}
-
 (async function() {
-  console.log(await sync());
+  switch (process.argv[2]) {
+    case "watchlist":
+      const watchlist = await syncWatchlist();
+      const [watchlistAdded, watchListDeleted] = watchlist;
+      console.log(`
+        watchlist.added: ${changeSummary(watchlistAdded)}
+        watchlist.deleted: ${changeSummary(watchListDeleted)}
+      `);
+      break;
+    case "ratings":
+      const ratings = await syncRatings();
+      const [
+        ratingsRate,
+        ratingsWatch,
+        ratingsUnrate,
+        ratingsUnwatch
+      ] = ratings;
+      console.log(`
+        ratings.rate: ${changeSummary(ratingsRate)}
+        ratings.unrate: ${changeSummary(ratingsUnrate)}
+        ratings.watch: ${changeSummary(ratingsWatch)}
+        ratings.unwatch: ${changeSummary(ratingsUnwatch)}
+      `);
+      break;
+  }
 })();

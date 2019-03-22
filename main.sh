@@ -15,4 +15,5 @@ usage() {
 
 set -ex
 
-node ./index.js
+node ./index.js watchlist
+node ./index.js ratings
