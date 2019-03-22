@@ -201,51 +201,13 @@ async function syncRatings() {
   ]);
 }
 
-function changeSummary(result) {
-  const summary = [];
-
-  for (const key in result) {
-    const changes = result[key];
-    const message = [];
-    for (const key in changes) {
-      const change = changes[key];
-      if (typeof change === "number") {
-        if (change > 0) message.push(`${change} ${key}`);
-      } else if (typeof change === "object") {
-        if (change.length > 0) message.push(JSON.stringify(change));
-      }
-    }
-
-    if (message.length) summary.push(`${key}: ${message.join(", ")}`);
-  }
-
-  return summary.length > 0 ? summary.join(", ") : "no change";
-}
-
 (async function() {
   switch (process.argv[2]) {
     case "watchlist":
-      const watchlist = await syncWatchlist();
-      const [watchlistAdded, watchListDeleted] = watchlist;
-      console.log(`
-        watchlist.added: ${changeSummary(watchlistAdded)}
-        watchlist.deleted: ${changeSummary(watchListDeleted)}
-      `);
+      console.log(await syncWatchlist());
       break;
     case "ratings":
-      const ratings = await syncRatings();
-      const [
-        ratingsRate,
-        ratingsWatch,
-        ratingsUnrate,
-        ratingsUnwatch
-      ] = ratings;
-      console.log(`
-        ratings.rate: ${changeSummary(ratingsRate)}
-        ratings.unrate: ${changeSummary(ratingsUnrate)}
-        ratings.watch: ${changeSummary(ratingsWatch)}
-        ratings.unwatch: ${changeSummary(ratingsUnwatch)}
-      `);
+      console.log(await syncRatings());
       break;
   }
 })();
