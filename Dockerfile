@@ -12,7 +12,7 @@ RUN apk add --no-cache \
 RUN wget -O /usr/bin/tickerd https://github.com/josh/tickerd/releases/latest/download/tickerd-linux-amd64 && chmod +x /usr/bin/tickerd
 
 WORKDIR /app
-RUN npm install csv@2.0.0
+RUN npm install csvtojson@2.0.8
 RUN npm install node-fetch@1.7.3
 COPY . .
 
