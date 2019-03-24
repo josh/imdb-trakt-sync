@@ -23,22 +23,6 @@ function diff(a, b, compare) {
   return { add, remove };
 }
 
-function isImdb(movie) {
-  return movie.id.startsWith("tt");
-}
-
-async function traktGet(path) {
-  const response = await fetch(`https://api.trakt.tv${path}`, {
-    headers: {
-      Authorization: `Bearer ${process.env.TRAKT_ACCESS_TOKEN}`,
-      "Content-Type": "application/json",
-      "trakt-api-version": "2",
-      "trakt-api-key": process.env.TRAKT_CLIENT_ID
-    }
-  });
-  return await response.json();
-}
-
 async function traktPost(path, data) {
   const response = await fetch(`https://api.trakt.tv${path}`, {
     method: "POST",
@@ -52,23 +36,6 @@ async function traktPost(path, data) {
     body: JSON.stringify(data)
   });
   return await response.json();
-}
-
-async function traktWatchlist() {
-  const movies = await traktGet("/sync/watchlist/movies");
-  return movies.map(movie => ({ id: movie.movie.ids.imdb })).filter(isImdb);
-}
-
-async function traktRatings() {
-  const movies = await traktGet("/sync/ratings/movies");
-  return movies
-    .map(movie => ({ id: movie.movie.ids.imdb, rating: movie.rating }))
-    .filter(isImdb);
-}
-
-async function traktWatched() {
-  const movies = await traktGet("/sync/watched/movies");
-  return movies.map(movie => ({ id: movie.movie.ids.imdb })).filter(isImdb);
 }
 
 function traktAdd(movies) {
@@ -123,29 +90,27 @@ function traktUnwatch(movies) {
   });
 }
 
-async function syncWatchlist(imdbWatchlistFilename) {
-  const imdbWatchlistPromise = JSON.parse(
+async function syncWatchlist(imdbWatchlistFilename, traktWatchlistFilename) {
+  const imdbWatchlist = JSON.parse(
     fs.readFileSync(imdbWatchlistFilename, "utf8")
   );
-  const traktWatchlistPromise = traktWatchlist();
+  const traktWatchlist = JSON.parse(
+    fs.readFileSync(traktWatchlistFilename, "utf8")
+  );
   const { add, remove } = diff(
-    await imdbWatchlistPromise,
-    await traktWatchlistPromise,
+    imdbWatchlist,
+    traktWatchlist,
     movie => movie.id
   );
   return await Promise.all([traktAdd(add), traktRemove(remove)]);
 }
 
-async function syncRatings(imdbRatingsFilename) {
-  const imdbRatingsPromise = JSON.parse(
-    fs.readFileSync(imdbRatingsFilename, "utf8")
+async function syncRatings(imdbRatingsFilename, traktRatingsFilename) {
+  const imdbRatings = JSON.parse(fs.readFileSync(imdbRatingsFilename, "utf8"));
+  const traktRatings = JSON.parse(
+    fs.readFileSync(traktRatingsFilename, "utf8")
   );
-  const traktRatingsPromise = traktRatings();
-  const { add, remove } = diff(
-    await imdbRatingsPromise,
-    await traktRatingsPromise,
-    movie => movie.id
-  );
+  const { add, remove } = diff(imdbRatings, traktRatings, movie => movie.id);
   return await Promise.all([
     traktRate(add),
     traktWatch(add),
@@ -157,10 +122,10 @@ async function syncRatings(imdbRatingsFilename) {
 (async function() {
   switch (process.argv[2]) {
     case "watchlist":
-      console.log(await syncWatchlist(process.argv[3]));
+      console.log(await syncWatchlist(process.argv[3], process.argv[4]));
       break;
     case "ratings":
-      console.log(await syncRatings(process.argv[3]));
+      console.log(await syncRatings(process.argv[3], process.argv[4]));
       break;
   }
 })();

@@ -16,7 +16,11 @@ usage() {
 set -euxo pipefail
 
 ./imdb-watchlist.sh "$IMDB_WATCHLIST_ID" > imdb-watchlist.json
-./imdb-ratings.sh "$IMDB_RATINGS_ID" "$IMDB_ID" "$IMDB_SID" > imdb-ratings.json
+./trakt-watchlist.sh "$TRAKT_CLIENT_ID" "$TRAKT_ACCESS_TOKEN" > trakt-watchlist.json
+node ./index.js watchlist imdb-watchlist.json trakt-watchlist.json
+rm imdb-watchlist.json trakt-watchlist.json
 
-node ./index.js watchlist imdb-watchlist.json
-node ./index.js ratings imdb-ratings.json
+./imdb-ratings.sh "$IMDB_RATINGS_ID" "$IMDB_ID" "$IMDB_SID" > imdb-ratings.json
+./trakt-ratings.sh "$TRAKT_CLIENT_ID" "$TRAKT_ACCESS_TOKEN" > trakt-ratings.json
+node ./index.js ratings imdb-ratings.json trakt-ratings.json
+rm imdb-ratings.json trakt-ratings.json
