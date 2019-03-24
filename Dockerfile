@@ -16,8 +16,7 @@ RUN npm install csvtojson@2.0.8
 RUN npm install node-fetch@1.7.3
 COPY . .
 
-ENTRYPOINT [ "/usr/bin/tickerd", "--" ]
-CMD [ "/app/main.sh" ]
+ENTRYPOINT [ "/usr/bin/tickerd", "--", "/app/main.sh" ]
 
 ENV TICKERD_HEALTHCHECK_FILE "/var/run/healthcheck"
 HEALTHCHECK --interval=1m --timeout=3s --start-period=3s --retries=1 \
