@@ -1,28 +1,6 @@
 const fetch = require("node-fetch");
 const fs = require("fs");
 
-function diff(a, b, compare) {
-  const add = [];
-  const remove = [];
-
-  const aIndex = new Set(a.map(compare));
-  const bIndex = new Set(b.map(compare));
-
-  for (const n of a) {
-    if (!bIndex.has(compare(n))) {
-      add.push(n);
-    }
-  }
-
-  for (const n of b) {
-    if (!aIndex.has(compare(n))) {
-      remove.push(n);
-    }
-  }
-
-  return { add, remove };
-}
-
 async function traktPost(path, data) {
   const response = await fetch(`https://api.trakt.tv${path}`, {
     method: "POST",
@@ -90,42 +68,22 @@ function traktUnwatch(movies) {
   });
 }
 
-async function syncWatchlist(imdbWatchlistFilename, traktWatchlistFilename) {
-  const imdbWatchlist = JSON.parse(
-    fs.readFileSync(imdbWatchlistFilename, "utf8")
-  );
-  const traktWatchlist = JSON.parse(
-    fs.readFileSync(traktWatchlistFilename, "utf8")
-  );
-  const { add, remove } = diff(
-    imdbWatchlist,
-    traktWatchlist,
-    movie => movie.id
-  );
-  return await Promise.all([traktAdd(add), traktRemove(remove)]);
-}
-
-async function syncRatings(imdbRatingsFilename, traktRatingsFilename) {
-  const imdbRatings = JSON.parse(fs.readFileSync(imdbRatingsFilename, "utf8"));
-  const traktRatings = JSON.parse(
-    fs.readFileSync(traktRatingsFilename, "utf8")
-  );
-  const { add, remove } = diff(imdbRatings, traktRatings, movie => movie.id);
-  return await Promise.all([
-    traktRate(add),
-    traktWatch(add),
-    traktUnrate(remove),
-    traktUnwatch(remove)
-  ]);
-}
-
 (async function() {
+  const { add, remove } = JSON.parse(fs.readFileSync(process.argv[3], "utf8"));
+
   switch (process.argv[2]) {
     case "watchlist":
-      console.log(await syncWatchlist(process.argv[3], process.argv[4]));
+      console.log(await Promise.all([traktAdd(add), traktRemove(remove)]));
       break;
     case "ratings":
-      console.log(await syncRatings(process.argv[3], process.argv[4]));
+      console.log(
+        await Promise.all([
+          traktRate(add),
+          traktWatch(add),
+          traktUnrate(remove),
+          traktUnwatch(remove)
+        ])
+      );
       break;
   }
 })();
