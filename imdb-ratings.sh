@@ -4,16 +4,28 @@
 
 set -eo pipefail
 
-if [ -z "$3" ]; then
+IMDB_RATINGS_ID=${1:-$IMDB_RATINGS_ID}
+IMDB_ID=${2:-$IMDB_ID}
+IMDB_SID=${3:-$IMDB_SID}
+
+if [ -z "$IMDB_RATINGS_ID" ] || [ -z "$IMDB_ID" ] || [ -z "$IMDB_SID" ]; then
   sed -ne '/^#/!q;s/.\{1,2\}//;1d;p' < "$0"
   exit 1
 fi
 
-curl --fail --silent --cookie "id=$2; sid=$3" \
-    "https://www.imdb.com/user/$1/ratings/export" | \
+log() {
+  COUNT=$(jq '. | length')
+  if [ -n "$COUNT" ]; then
+    echo "imdb-ratings: $COUNT movies" >&2
+  fi
+}
+
+curl --fail --silent --cookie "id=$IMDB_ID; sid=$IMDB_SID" \
+    "https://www.imdb.com/user/$IMDB_RATINGS_ID/ratings/export" | \
   ./csvtojson.sh | \
   jq 'map({
     id: .Const,
     rating: .["Your Rating"] | tonumber,
     timestamp: .["Date Rated"] | strptime("%Y-%m-%d") | todateiso8601
-  })'
+  })'| \
+  tee >(log)

@@ -1,7 +1,10 @@
 #!/bin/bash
 # Usage: imdb-trakt-sync <command>
 
-case "$1" in
+COMMAND="$1"
+shift
+
+case "$COMMAND" in
 imdb-ratings )
   exec ./imdb-ratings.sh "$@"
   ;;
