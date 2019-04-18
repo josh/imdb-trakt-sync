@@ -16,9 +16,4 @@ usage() {
 set -euxo pipefail
 
 node ./index.js watchlist <(./diff-watchlist.sh)
-
-node ./index.js ratings <(
-  node ./diff.js \
-    <(./imdb-ratings.sh "$IMDB_RATINGS_ID" "$IMDB_ID" "$IMDB_SID") \
-    <(./trakt-ratings.sh "$TRAKT_CLIENT_ID" "$TRAKT_ACCESS_TOKEN")
-)
+node ./index.js ratings <(./diff-ratings.sh)
