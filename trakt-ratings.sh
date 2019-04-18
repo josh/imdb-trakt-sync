@@ -25,5 +25,9 @@ curl --fail --silent \
   --header "trakt-api-version: 2" \
   --header "trakt-api-key: $TRAKT_CLIENT_ID" \
   "https://api.trakt.tv/sync/ratings/movies" |
-  jq 'map({id: .movie.ids.imdb, rating: .rating}) | map(select(.id))' | \
+  jq 'map({
+    id: .movie.ids.imdb,
+    rating: .rating,
+    timestamp: .rated_at
+  }) | map(select(.id))' | \
   tee >(log)

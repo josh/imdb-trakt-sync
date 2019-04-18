@@ -35,6 +35,7 @@ function traktRate(movies) {
   return traktPost("/sync/ratings", {
     movies: movies.map(movie => ({
       rating: movie.rating,
+      rated_at: movie.timestamp,
       ids: { imdb: movie.id }
     }))
   });
