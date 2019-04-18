@@ -17,6 +17,9 @@ trakt-ratings )
 trakt-watchlist )
   exec ./trakt-watchlist.sh "$@"
   ;;
+diff-watchlist )
+  exec ./diff-watchlist.sh "$@"
+  ;;
 '' | sync )
   exec ./sync.sh
   ;;

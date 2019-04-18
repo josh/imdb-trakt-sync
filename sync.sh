@@ -15,11 +15,7 @@ usage() {
 
 set -euxo pipefail
 
-node ./index.js watchlist <(
-  node ./diff.js \
-    <(./imdb-watchlist.sh "$IMDB_WATCHLIST_ID") \
-    <(./trakt-watchlist.sh "$TRAKT_CLIENT_ID" "$TRAKT_ACCESS_TOKEN")
-)
+node ./index.js watchlist <(./diff-watchlist.sh)
 
 node ./index.js ratings <(
   node ./diff.js \
