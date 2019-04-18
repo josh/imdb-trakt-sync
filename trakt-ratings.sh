@@ -28,6 +28,6 @@ curl --fail --silent \
   jq 'map({
     id: .movie.ids.imdb,
     rating: .rating,
-    timestamp: .rated_at
+    timestamp: .rated_at | sub("00.000Z"; "00Z")
   }) | map(select(.id))' | \
   tee >(log)
