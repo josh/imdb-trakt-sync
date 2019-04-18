@@ -18,14 +18,11 @@ log_remove() {
   fi
 }
 
-A=$(./imdb-watchlist.sh "$IMDB_WATCHLIST_ID")
-B=$(./trakt-watchlist.sh "$TRAKT_CLIENT_ID" "$TRAKT_ACCESS_TOKEN")
-
 jq --exit-status --null-input \
-  --argjson a "$A" \
-  --argjson b "$B" '
-($a | map(.id)) as $a_set |
-($b | map(.id)) as $b_set |
+  --slurpfile a <(./imdb-watchlist.sh "$IMDB_WATCHLIST_ID") \
+  --slurpfile b <(./trakt-watchlist.sh "$TRAKT_CLIENT_ID" "$TRAKT_ACCESS_TOKEN") '
+($a[0] | map(.id)) as $a_set |
+($b[0] | map(.id)) as $b_set |
 {
   add: ($a_set - $b_set) | map({id: . }),
   remove: ($b_set - $a_set) | map({id: . })
