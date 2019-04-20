@@ -13,7 +13,7 @@ fi
 
 log() {
   COUNT=$(jq '. | length')
-  if [ -n "$COUNT" ]; then
+  if [ "$COUNT" -ne 0 ]; then
     echo "imdb-watchlist: $COUNT movies" >&2
   fi
 }
@@ -21,5 +21,5 @@ log() {
 curl --fail --silent \
     "https://www.imdb.com/list/$IMDB_WATCHLIST_ID/export" | \
   ./csvtojson.sh | \
-  jq 'map({id: .Const})' | \
+  jq --exit-status 'map({id: .Const}) | if length == 0 then null else . end' | \
   tee >(log)
