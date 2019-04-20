@@ -11,6 +11,9 @@ imdb-ratings )
 imdb-watchlist )
   exec ./imdb-watchlist.sh "$@"
   ;;
+trakt-history )
+  exec ./trakt-history.sh "$@"
+  ;;
 trakt-ratings )
   exec ./trakt-ratings.sh "$@"
   ;;
