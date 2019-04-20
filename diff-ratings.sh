@@ -21,6 +21,8 @@ log_remove() {
 jq --exit-status --null-input \
   --slurpfile a <(./imdb-ratings.sh "$IMDB_RATINGS_ID" "$IMDB_ID" "$IMDB_SID") \
   --slurpfile b <(./trakt-ratings.sh "$TRAKT_CLIENT_ID" "$TRAKT_ACCESS_TOKEN") '
+if ($a | length == 0) then halt_error(1) else true end |
+if ($b | length == 0) then halt_error(1) else true end |
 ($a[0] | map({key: .id, value: .}) | from_entries) as $a_set |
 ($b[0] | map({key: .id, value: .}) | from_entries) as $b_set |
 {

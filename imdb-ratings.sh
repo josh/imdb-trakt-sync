@@ -15,7 +15,7 @@ fi
 
 log() {
   COUNT=$(jq '. | length')
-  if [ -n "$COUNT" ]; then
+  if [[ "$COUNT" -ne 0 ]]; then
     echo "imdb-ratings: $COUNT movies" >&2
   fi
 }
@@ -27,5 +27,5 @@ curl --fail --silent --cookie "id=$IMDB_ID; sid=$IMDB_SID" \
     id: .Const,
     rating: .["Your Rating"] | tonumber,
     timestamp: .["Date Rated"] | strptime("%Y-%m-%d") | todateiso8601
-  })'| \
+  }) | if length == 0 then halt_error(1) else . end'| \
   tee >(log)
