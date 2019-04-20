@@ -5,7 +5,7 @@ COMMAND="$1"
 shift
 
 case "$COMMAND" in
-diff-ratings | diff-watchlist | imdb-ratings | imdb-watchlist | trakt-history | trakt-ratings | trakt-watchlist )
+diff-history | diff-ratings | diff-watchlist | imdb-ratings | imdb-watchlist | trakt-history | trakt-ratings | trakt-watchlist )
   exec "./$COMMAND.sh" "$@"
   ;;
 '' | sync )

@@ -54,7 +54,7 @@ function traktWatch(movies) {
   if (!movies.length) return {};
   return traktPost("/sync/history", {
     movies: movies.map(movie => ({
-      watched_at: movies.timestamp,
+      watched_at: movie.timestamp,
       ids: { imdb: movie.id }
     }))
   });
@@ -68,13 +68,10 @@ function traktWatch(movies) {
       console.log(await Promise.all([traktAdd(add), traktRemove(remove)]));
       break;
     case "ratings":
-      console.log(
-        await Promise.all([
-          traktRate(add),
-          traktWatch(add),
-          traktUnrate(remove)
-        ])
-      );
+      console.log(await Promise.all([traktRate(add), traktUnrate(remove)]));
+      break;
+    case "history":
+      console.log(await Promise.all([traktWatch(add)]));
       break;
   }
 })();

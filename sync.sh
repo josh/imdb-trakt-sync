@@ -17,3 +17,4 @@ set -euxo pipefail
 
 node ./index.js watchlist <(./diff-watchlist.sh)
 node ./index.js ratings <(./diff-ratings.sh)
+node ./index.js history <(./diff-history.sh)

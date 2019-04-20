@@ -24,7 +24,7 @@ curl --fail --silent \
   --header "Content-Type: application/json" \
   --header "trakt-api-version: 2" \
   --header "trakt-api-key: $TRAKT_CLIENT_ID" \
-  "https://api.trakt.tv/sync/history/movies?type=watch" |
+  "https://api.trakt.tv/sync/history/movies?type=watch&limit=10000" |
   jq 'map({
     id: .movie.ids.imdb,
     timestamp: .watched_at | sub(".000Z"; "Z")
