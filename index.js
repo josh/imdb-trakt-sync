@@ -60,15 +60,6 @@ function traktWatch(movies) {
   });
 }
 
-function traktUnwatch(movies) {
-  if (!movies.length) return {};
-  return traktPost("/sync/history/remove", {
-    movies: movies.map(movie => ({
-      ids: { imdb: movie.id }
-    }))
-  });
-}
-
 (async function() {
   const { add, remove } = JSON.parse(fs.readFileSync(process.argv[3], "utf8"));
 
@@ -81,8 +72,7 @@ function traktUnwatch(movies) {
         await Promise.all([
           traktRate(add),
           traktWatch(add),
-          traktUnrate(remove),
-          traktUnwatch(remove)
+          traktUnrate(remove)
         ])
       );
       break;
