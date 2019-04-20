@@ -1,6 +1,6 @@
 #!/bin/bash
-# Usage: trakt-ratings <TRAKT_CLIENT_ID> <TRAKT_ACCESS_TOKEN>
-#   [{"id": "tt0111161", "rating": 10}]
+# Usage: trakt-history <TRAKT_CLIENT_ID> <TRAKT_ACCESS_TOKEN>
+#   [{"id": "tt0111161", "timestamp": "2020-01-01T12:00:00Z"}]
 
 set -eo pipefail
 
@@ -15,7 +15,7 @@ fi
 log() {
   COUNT=$(jq '. | length')
   if [ -n "$COUNT" ]; then
-    echo "trakt-ratings: $COUNT movies" >&2
+    echo "trakt-history: $COUNT movies" >&2
   fi
 }
 
@@ -24,10 +24,9 @@ curl --fail --silent \
   --header "Content-Type: application/json" \
   --header "trakt-api-version: 2" \
   --header "trakt-api-key: $TRAKT_CLIENT_ID" \
-  "https://api.trakt.tv/sync/ratings/movies" |
+  "https://api.trakt.tv/sync/history/movies?type=watch" |
   jq 'map({
     id: .movie.ids.imdb,
-    rating: .rating,
-    timestamp: .rated_at | sub(".000Z"; "Z")
+    timestamp: .watched_at | sub(".000Z"; "Z")
   }) | map(select(.id))' | \
   tee >(log)
