@@ -5,26 +5,8 @@ COMMAND="$1"
 shift
 
 case "$COMMAND" in
-imdb-ratings )
-  exec ./imdb-ratings.sh "$@"
-  ;;
-imdb-watchlist )
-  exec ./imdb-watchlist.sh "$@"
-  ;;
-trakt-history )
-  exec ./trakt-history.sh "$@"
-  ;;
-trakt-ratings )
-  exec ./trakt-ratings.sh "$@"
-  ;;
-trakt-watchlist )
-  exec ./trakt-watchlist.sh "$@"
-  ;;
-diff-ratings )
-  exec ./diff-ratings.sh "$@"
-  ;;
-diff-watchlist )
-  exec ./diff-watchlist.sh "$@"
+diff-ratings | diff-watchlist | imdb-ratings | imdb-watchlist | trakt-history | trakt-ratings | trakt-watchlist )
+  exec "./$COMMAND.sh" "$@"
   ;;
 '' | sync )
   exec ./sync.sh
