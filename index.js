@@ -16,20 +16,6 @@ async function traktPost(path, data) {
   return await response.json();
 }
 
-function traktAdd(movies) {
-  if (!movies.length) return {};
-  return traktPost("/sync/watchlist", {
-    movies: movies.map(movie => ({ ids: { imdb: movie.id } }))
-  });
-}
-
-function traktRemove(movies) {
-  if (!movies.length) return {};
-  return traktPost("/sync/watchlist/remove", {
-    movies: movies.map(movie => ({ ids: { imdb: movie.id } }))
-  });
-}
-
 function traktRate(movies) {
   if (!movies.length) return {};
   return traktPost("/sync/ratings", {
@@ -50,28 +36,12 @@ function traktUnrate(movies) {
   });
 }
 
-function traktWatch(movies) {
-  if (!movies.length) return {};
-  return traktPost("/sync/history", {
-    movies: movies.map(movie => ({
-      watched_at: movie.timestamp,
-      ids: { imdb: movie.id }
-    }))
-  });
-}
-
 (async function() {
   const { add, remove } = JSON.parse(fs.readFileSync(process.argv[3], "utf8"));
 
   switch (process.argv[2]) {
-    case "watchlist":
-      console.log(await Promise.all([traktAdd(add), traktRemove(remove)]));
-      break;
     case "ratings":
       console.log(await Promise.all([traktRate(add), traktUnrate(remove)]));
-      break;
-    case "history":
-      console.log(await Promise.all([traktWatch(add)]));
       break;
   }
 })();

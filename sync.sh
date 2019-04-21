@@ -15,6 +15,6 @@ usage() {
 
 set -euxo pipefail
 
-node ./index.js watchlist <(./diff-watchlist.sh)
+./diff-watchlist.sh | ./trakt-update-watchlist.sh
 node ./index.js ratings <(./diff-ratings.sh)
-node ./index.js history <(./diff-history.sh)
+./diff-history.sh | ./trakt-update-history.sh
