@@ -21,4 +21,5 @@ jq '.add' | \
     --header "trakt-api-version: 2" \
     --header "trakt-api-key: $TRAKT_CLIENT_ID" \
     --data-binary @- \
-    "https://api.trakt.tv/sync/history" | jq
+    "https://api.trakt.tv/sync/history" | \
+  jq '{added: .added.movies, not_found: .not_found.movies}'

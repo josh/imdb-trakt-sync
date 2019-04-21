@@ -13,7 +13,6 @@ RUN wget -O /usr/bin/tickerd https://github.com/josh/tickerd/releases/latest/dow
 
 WORKDIR /app
 RUN npm install csvtojson@2.0.8
-RUN npm install node-fetch@1.7.3
 COPY . .
 
 ENTRYPOINT [ "/usr/bin/tickerd", "--", "/app/main.sh" ]
