@@ -15,6 +15,6 @@ usage() {
 
 set -euxo pipefail
 
-./diff-watchlist.sh | ./trakt-update-watchlist.sh
+./diff-movie-watchlist.sh | ./trakt-update-watchlist.sh
 ./diff-ratings.sh | ./trakt-update-ratings.sh
 ./diff-history.sh | ./trakt-update-history.sh

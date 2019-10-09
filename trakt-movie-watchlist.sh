@@ -1,5 +1,5 @@
 #!/bin/bash
-# Usage: trakt-watchlist <TRAKT_CLIENT_ID> <TRAKT_ACCESS_TOKEN>
+# Usage: trakt-movie-watchlist <TRAKT_CLIENT_ID> <TRAKT_ACCESS_TOKEN>
 #   [{"id": "tt0111161"}]
 
 set -eo pipefail
@@ -15,7 +15,7 @@ fi
 log() {
   COUNT=$(jq '. | length')
   if [ -n "$COUNT" ]; then
-    echo "trakt-watchlist: $COUNT movies" >&2
+    echo "trakt-movie-watchlist: $COUNT movies" >&2
   fi
 }
 

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Usage: imdb-watchlist <IMDB_WATCHLIST_ID>
+# Usage: imdb-movie-watchlist <IMDB_WATCHLIST_ID>
 #   [{"id": "tt0111161"}]
 
 set -eo pipefail
@@ -14,7 +14,7 @@ fi
 log() {
   COUNT=$(jq '. | length')
   if [[ "$COUNT" -ne 0 ]]; then
-    echo "imdb-watchlist: $COUNT movies" >&2
+    echo "imdb-movie-watchlist: $COUNT movies" >&2
   fi
 }
 
