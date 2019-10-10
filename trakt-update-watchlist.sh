@@ -1,10 +1,11 @@
 #!/bin/bash
-# Usage: trakt-update-watchlist <TRAKT_CLIENT_ID> <TRAKT_ACCESS_TOKEN>
+# Usage: trakt-update-watchlist [movies|shows] <TRAKT_CLIENT_ID> <TRAKT_ACCESS_TOKEN>
 
 set -eo pipefail
 
-TRAKT_CLIENT_ID=${1:-$TRAKT_CLIENT_ID}
-TRAKT_ACCESS_TOKEN=${2:-$TRAKT_ACCESS_TOKEN}
+TYPE=${1}
+TRAKT_CLIENT_ID=${2:-$TRAKT_CLIENT_ID}
+TRAKT_ACCESS_TOKEN=${3:-$TRAKT_ACCESS_TOKEN}
 
 if [ -z "$TRAKT_CLIENT_ID" ] || [ -z "$TRAKT_ACCESS_TOKEN" ]; then
   sed -ne '/^#/!q;s/.\{1,2\}//;1d;p' < "$0"
@@ -14,8 +15,8 @@ fi
 cat >/tmp/trakt-update-watchlist.json
 
 jq '.add' </tmp/trakt-update-watchlist.json | \
-  jq 'map({ids: {imdb: .id}})' | \
-  jq '{movies: .}' | \
+  jq --arg type "$TYPE" 'map({ids: {imdb: .id}})' | \
+  jq --arg type "$TYPE" '{($type): .}' | \
   curl --fail --silent \
     --request POST \
     --header "Authorization: Bearer $TRAKT_ACCESS_TOKEN" \
@@ -24,11 +25,11 @@ jq '.add' </tmp/trakt-update-watchlist.json | \
     --header "trakt-api-key: $TRAKT_CLIENT_ID" \
     --data-binary @- \
     "https://api.trakt.tv/sync/watchlist" | \
-  jq '{added: .added.movies, existing: .existing.movies, not_found: .not_found.movies}'
+  jq --arg type "$TYPE" '{added: .added[$type], existing: .existing[$type], not_found: .not_found[$type]}'
 
 jq '.remove' </tmp/trakt-update-watchlist.json | \
-  jq 'map({ids: {imdb: .id}})' | \
-  jq '{movies: .}' | \
+  jq --arg type "$TYPE" 'map({ids: {imdb: .id}})' | \
+  jq --arg type "$TYPE" '{($type): .}' | \
   curl --fail --silent \
     --request POST \
     --header "Authorization: Bearer $TRAKT_ACCESS_TOKEN" \
@@ -37,6 +38,6 @@ jq '.remove' </tmp/trakt-update-watchlist.json | \
     --header "trakt-api-key: $TRAKT_CLIENT_ID" \
     --data-binary @- \
     "https://api.trakt.tv/sync/watchlist/remove" | \
-  jq '{deleted: .deleted.movies, not_found: .not_found.movies}'
+  jq --arg type "$TYPE" '{deleted: .deleted[$type], not_found: .not_found[$type]}'
 
 rm /tmp/trakt-update-watchlist.json
