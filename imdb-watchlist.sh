@@ -4,7 +4,7 @@
 
 set -eo pipefail
 
-TYPE="$1"
+TYPE=${1}
 IMDB_WATCHLIST_ID=${2:-$IMDB_WATCHLIST_ID}
 
 if [ -z "$IMDB_WATCHLIST_ID" ]; then
