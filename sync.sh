@@ -2,8 +2,8 @@
 # Usage: sync
 
 usage() {
-  sed -ne '/^#/!q;s/.\{1,2\}//;1d;p' < "$0"
-  exit 1
+	sed -ne '/^#/!q;s/.\{1,2\}//;1d;p' <"$0"
+	exit 1
 }
 
 [ -n "$IMDB_ID" ] || usage

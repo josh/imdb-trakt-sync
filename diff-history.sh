@@ -5,20 +5,20 @@
 set -eo pipefail
 
 log_add() {
-  COUNT=$(jq '.add | length')
-  if [ -n "$COUNT" ]; then
-    echo "diff-history: add $COUNT movies" >&2
-  fi
+	COUNT=$(jq '.add | length')
+	if [ -n "$COUNT" ]; then
+		echo "diff-history: add $COUNT movies" >&2
+	fi
 }
 
 jq --exit-status --null-input \
-  --slurpfile a <(./imdb-ratings.sh "$IMDB_RATINGS_ID" "$IMDB_ID" "$IMDB_SID") \
-  --slurpfile b <(./trakt-history.sh "$TRAKT_CLIENT_ID" "$TRAKT_ACCESS_TOKEN") '
+	--slurpfile a <(./imdb-ratings.sh "$IMDB_RATINGS_ID" "$IMDB_ID" "$IMDB_SID") \
+	--slurpfile b <(./trakt-history.sh "$TRAKT_CLIENT_ID" "$TRAKT_ACCESS_TOKEN") '
 if ($a | length == 0) then halt_error(1) else true end |
 if ($b | length == 0) then halt_error(1) else true end |
 ($a[0] | map({key: .id, value: .timestamp}) | from_entries) as $a_set |
 ($b[0] | map({key: .id, value: .timestamp}) | from_entries) as $b_set |
 {
   add: $a[0] | map(select($b_set[.id] == null)) | map({id: .id, timestamp: .timestamp})
-}' | \
-  tee >(log_add)
+}' |
+	tee >(log_add)

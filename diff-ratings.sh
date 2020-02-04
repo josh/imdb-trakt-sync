@@ -5,22 +5,22 @@
 set -eo pipefail
 
 log_add() {
-  COUNT=$(jq '.add | length')
-  if [ -n "$COUNT" ]; then
-    echo "diff-ratings: add/update $COUNT movies" >&2
-  fi
+	COUNT=$(jq '.add | length')
+	if [ -n "$COUNT" ]; then
+		echo "diff-ratings: add/update $COUNT movies" >&2
+	fi
 }
 
 log_remove() {
-  COUNT=$(jq '.remove | length')
-  if [ -n "$COUNT" ]; then
-    echo "diff-ratings: remove $COUNT movies" >&2
-  fi
+	COUNT=$(jq '.remove | length')
+	if [ -n "$COUNT" ]; then
+		echo "diff-ratings: remove $COUNT movies" >&2
+	fi
 }
 
 jq --exit-status --null-input \
-  --slurpfile a <(./imdb-ratings.sh "$IMDB_RATINGS_ID" "$IMDB_ID" "$IMDB_SID") \
-  --slurpfile b <(./trakt-ratings.sh "$TRAKT_CLIENT_ID" "$TRAKT_ACCESS_TOKEN") '
+	--slurpfile a <(./imdb-ratings.sh "$IMDB_RATINGS_ID" "$IMDB_ID" "$IMDB_SID") \
+	--slurpfile b <(./trakt-ratings.sh "$TRAKT_CLIENT_ID" "$TRAKT_ACCESS_TOKEN") '
 if ($a | length == 0) then halt_error(1) else true end |
 if ($b | length == 0) then halt_error(1) else true end |
 ($a[0] | map({key: .id, value: .}) | from_entries) as $a_set |
@@ -28,5 +28,5 @@ if ($b | length == 0) then halt_error(1) else true end |
 {
   add: $a[0] | map(select(. != $b_set[.id])),
   remove: $b[0] | map(select($a_set[.id] == null))
-}' | \
-  tee >(log_add) | tee >(log_remove)
+}' |
+	tee >(log_add) | tee >(log_remove)

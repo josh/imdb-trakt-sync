@@ -5,14 +5,14 @@ COMMAND="$1"
 shift
 
 case "$COMMAND" in
-diff-history | diff-ratings | diff-movie-watchlist | diff-show-watchlist | imdb-ratings | imdb-movie-watchlist | imdb-show-watchlist | trakt-history | trakt-ratings | trakt-movie-watchlist | trakt-show-watchlist )
-  exec "./$COMMAND.sh" "$@"
-  ;;
-'' | sync )
-  exec ./sync.sh
-  ;;
-help | --help | -h | * )
-  sed -ne '/^#/!q;s/.\{1,2\}//;1d;p' < "$0"
-  exit 0
-  ;;
+diff-history | diff-ratings | diff-movie-watchlist | diff-show-watchlist | imdb-ratings | imdb-movie-watchlist | imdb-show-watchlist | trakt-history | trakt-ratings | trakt-movie-watchlist | trakt-show-watchlist)
+	exec "./$COMMAND.sh" "$@"
+	;;
+'' | sync)
+	exec ./sync.sh
+	;;
+help | --help | -h | *)
+	sed -ne '/^#/!q;s/.\{1,2\}//;1d;p' <"$0"
+	exit 0
+	;;
 esac
