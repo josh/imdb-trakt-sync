@@ -6,8 +6,8 @@ usage() {
 	exit 1
 }
 
-[ -n "$IMDB_ID" ] || usage
-[ -n "$IMDB_SID" ] || usage
+[ -n "$IMDB_UBID_MAIN" ] || usage
+[ -n "$IMDB_AT_MAIN" ] || usage
 [ -n "$IMDB_RATINGS_ID" ] || usage
 [ -n "$IMDB_WATCHLIST_ID" ] || usage
 [ -n "$TRAKT_ACCESS_TOKEN" ] || usage
