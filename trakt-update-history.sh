@@ -11,6 +11,7 @@ if [ -z "$TRAKT_CLIENT_ID" ] || [ -z "$TRAKT_ACCESS_TOKEN" ]; then
 	exit 1
 fi
 
+sleep 1
 jq '.add' |
 	jq 'map({watched_at: .timestamp, ids: {imdb: .id}})' |
 	jq '{movies: .}' |

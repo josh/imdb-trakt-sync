@@ -14,6 +14,7 @@ fi
 
 cat >/tmp/trakt-update-watchlist.json
 
+sleep 1
 jq '.add' </tmp/trakt-update-watchlist.json |
 	jq --arg type "$TYPE" 'map({ids: {imdb: .id}})' |
 	jq --arg type "$TYPE" '{($type): .}' |
@@ -27,6 +28,7 @@ jq '.add' </tmp/trakt-update-watchlist.json |
 		"https://api.trakt.tv/sync/watchlist" |
 	jq --arg type "$TYPE" '{added: .added[$type], existing: .existing[$type], not_found: .not_found[$type]}'
 
+sleep 1
 jq '.remove' </tmp/trakt-update-watchlist.json |
 	jq --arg type "$TYPE" 'map({ids: {imdb: .id}})' |
 	jq --arg type "$TYPE" '{($type): .}' |

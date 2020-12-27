@@ -13,6 +13,7 @@ fi
 
 cat >/tmp/trakt-update-ratings.json
 
+sleep 1
 jq '.add' </tmp/trakt-update-ratings.json |
 	jq 'map({rating: .rating, rated_at: .timestamp, ids: {imdb: .id}})' |
 	jq '{movies: .}' |
@@ -26,6 +27,7 @@ jq '.add' </tmp/trakt-update-ratings.json |
 		"https://api.trakt.tv/sync/ratings" |
 	jq '{added: .added.movies, not_found: .not_found.movies}'
 
+sleep 1
 jq '.remove' </tmp/trakt-update-ratings.json |
 	jq 'map({ids: {imdb: .id}})' |
 	jq '{movies: .}' |
