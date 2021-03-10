@@ -9,7 +9,7 @@ version: "3"
 services:
   imdb_trakt_sync:
     restart: always
-    image: ghcr.io/josh/imdb-trakt-sync/imdb-trakt-sync
+    image: ghcr.io/josh/imdb-trakt-sync
     environment:
       - IMDB_UBID_MAIN=***
       - IMDB_AT_MAIN=***
