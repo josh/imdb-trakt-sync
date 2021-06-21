@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [[ -x ./node_modules/.bin/csvtojson ]]; then
+if [[ -f ./node_modules/.bin/csvtojson ]]; then
 	exec ./node_modules/.bin/csvtojson "$@"
 else
 	echo "missing csvtojson" >&2
