@@ -17,6 +17,6 @@ COPY . .
 
 ENTRYPOINT [ "/usr/bin/tickerd", "--", "/app/main.sh" ]
 
-ENV TICKERD_HEALTHCHECK_FILE "/var/run/healthcheck"
+ENV TICKERD_HEALTHCHECK_PORT 9000
 HEALTHCHECK --interval=1m --timeout=3s --start-period=3s --retries=1 \
   CMD [ "/usr/bin/tickerd", "-healthcheck" ]
