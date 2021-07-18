@@ -16,7 +16,7 @@ cat >/tmp/trakt-update-watchlist.json
 
 sleep 1
 jq '.add' </tmp/trakt-update-watchlist.json |
-	jq --arg type "$TYPE" 'map({ids: {imdb: .id}})' |
+	jq 'map({ids: {imdb: .id}})' |
 	jq --arg type "$TYPE" '{($type): .}' |
 	curl --fail --silent \
 		--request POST \
@@ -30,7 +30,7 @@ jq '.add' </tmp/trakt-update-watchlist.json |
 
 sleep 1
 jq '.remove' </tmp/trakt-update-watchlist.json |
-	jq --arg type "$TYPE" 'map({ids: {imdb: .id}})' |
+	jq 'map({ids: {imdb: .id}})' |
 	jq --arg type "$TYPE" '{($type): .}' |
 	curl --fail --silent \
 		--request POST \
