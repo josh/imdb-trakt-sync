@@ -21,8 +21,8 @@ log_remove() {
 }
 
 jq --exit-status --null-input \
-	--slurpfile a <("./imdb-$TYPE-watchlist.sh" "$IMDB_WATCHLIST_ID") \
-	--slurpfile b <("./trakt-$TYPE-watchlist.sh" "$TRAKT_CLIENT_ID" "$TRAKT_ACCESS_TOKEN") '
+	--slurpfile a <("./imdb-watchlist.sh" "$TYPE" "$IMDB_WATCHLIST_ID") \
+	--slurpfile b <("./trakt-watchlist.sh" "$TYPE" "$TRAKT_CLIENT_ID" "$TRAKT_ACCESS_TOKEN") '
 if ($a | length == 0) then halt_error(1) else true end |
 if ($b | length == 0) then halt_error(1) else true end |
 ($a[0] | map(.id)) as $a_set |
