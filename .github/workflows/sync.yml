@@ -1,0 +1,50 @@
+name: Sync
+
+on:
+  schedule:
+    - cron: "0 8 * * *"
+  workflow_dispatch:
+
+env:
+  IMDB_UBID_MAIN: ${{ secrets.IMDB_UBID_MAIN }}
+  IMDB_AT_MAIN: ${{ secrets.IMDB_AT_MAIN }}
+  IMDB_RATINGS_ID: ${{ secrets.IMDB_RATINGS_ID }}
+  IMDB_WATCHLIST_ID: ${{ secrets.IMDB_WATCHLIST_ID }}
+  TRAKT_CLIENT_ID: ${{ secrets.TRAKT_CLIENT_ID }}
+  TRAKT_ACCESS_TOKEN: ${{ secrets.TRAKT_ACCESS_TOKEN }}
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+
+      - name: Install npm dependencies
+        run: |
+          npm install csvtojson@2.0.8
+
+      - name: Sync movie watchlist
+        run: |
+          ./diff-watchlist.sh movie | ./trakt-update-watchlist.sh movies
+
+      - name: Sync show watchlist
+        run: |
+          ./diff-watchlist.sh show | ./trakt-update-watchlist.sh shows
+
+      - name: Sync movie ratings
+        run: |
+          ./diff-ratings.sh movie | ./trakt-update-ratings.sh movies
+
+      - name: Sync show ratings
+        run: |
+          ./diff-ratings.sh show | ./trakt-update-ratings.sh shows
+
+      - name: Sync history
+        run: |
+          ./diff-history.sh | ./trakt-update-history.sh
