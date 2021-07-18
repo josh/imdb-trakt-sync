@@ -5,14 +5,12 @@ RUN apk add --no-cache \
   ca-certificates \
   curl \
   jq \
-  nodejs \
-  npm \
+  python3 \
   wget
 
 RUN wget -O /usr/bin/tickerd https://github.com/josh/tickerd/releases/latest/download/tickerd-linux-amd64 && chmod +x /usr/bin/tickerd
 
 WORKDIR /app
-RUN npm install csvtojson@2.0.8
 COPY . .
 
 ENTRYPOINT [ "/usr/bin/tickerd", "--", "/app/main.sh" ]

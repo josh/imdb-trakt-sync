@@ -30,6 +30,6 @@ log() {
 
 curl --fail --silent \
 	"https://www.imdb.com/list/$IMDB_WATCHLIST_ID/export" |
-	./csvtojson.sh |
+	./csv2json.py |
 	jq --arg type "$TITLE_TYPE" 'map(select(.["Title Type"] == $type) | {id: .Const})' |
 	tee >(log)

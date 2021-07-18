@@ -32,7 +32,7 @@ log() {
 
 curl --fail --silent --cookie "ubid-main=$IMDB_UBID_MAIN; at-main=$IMDB_AT_MAIN" \
 	"https://www.imdb.com/user/$IMDB_RATINGS_ID/ratings/export" |
-	./csvtojson.sh |
+	./csv2json.py |
 	jq --arg type "$TITLE_TYPE" 'map(select(.["Title Type"] | test($type)) | {
 		id: .Const,
 		rating: .["Your Rating"] | tonumber,
