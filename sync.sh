@@ -17,5 +17,6 @@ set -euxo pipefail
 
 ./diff-movie-watchlist.sh | ./trakt-update-watchlist.sh movies
 ./diff-show-watchlist.sh | ./trakt-update-watchlist.sh shows
-./diff-ratings.sh | ./trakt-update-ratings.sh movies
+./diff-ratings.sh movie | ./trakt-update-ratings.sh movies
+./diff-ratings.sh show | ./trakt-update-ratings.sh shows
 ./diff-history.sh | ./trakt-update-history.sh

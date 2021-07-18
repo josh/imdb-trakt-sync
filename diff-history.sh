@@ -12,7 +12,7 @@ log_add() {
 }
 
 jq --exit-status --null-input \
-	--slurpfile a <(./imdb-ratings.sh "$IMDB_RATINGS_ID" "$IMDB_UBID_MAIN" "$IMDB_AT_MAIN") \
+	--slurpfile a <(./imdb-ratings.sh movie "$IMDB_RATINGS_ID" "$IMDB_UBID_MAIN" "$IMDB_AT_MAIN") \
 	--slurpfile b <(./trakt-history.sh "$TRAKT_CLIENT_ID" "$TRAKT_ACCESS_TOKEN") '
 if ($a | length == 0) then halt_error(1) else true end |
 if ($b | length == 0) then halt_error(1) else true end |
