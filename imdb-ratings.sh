@@ -17,7 +17,7 @@ fi
 if [ "$TYPE" == "movie" ]; then
 	TITLE_TYPE="movie|short|video|tvMovie|tvSpecial"
 elif [ "$TYPE" == "show" ]; then
-	TITLE_TYPE="tvSeries"
+	TITLE_TYPE="tvSeries|tvMiniSeries"
 else
 	sed -ne '/^#/!q;s/.\{1,2\}//;1d;p' <"$0"
 	exit 1
