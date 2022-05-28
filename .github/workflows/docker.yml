@@ -3,7 +3,7 @@ name: Docker
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
   schedule:
     - cron: "0 0 1 * *"
@@ -41,7 +41,6 @@ jobs:
           IMAGE_ID=ghcr.io/${{ github.repository }}
 
           VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-          [ "$VERSION" == "master" ] && VERSION=latest
           [ "$VERSION" == "main" ] && VERSION=latest
 
           echo IMAGE_ID=$IMAGE_ID
