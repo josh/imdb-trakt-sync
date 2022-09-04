@@ -21,26 +21,21 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Sync movie watchlist
-        continue-on-error: true
         run: |
           ./diff-watchlist.sh movie | ./trakt-update-watchlist.sh movies
 
       - name: Sync show watchlist
-        continue-on-error: true
         run: |
           ./diff-watchlist.sh show | ./trakt-update-watchlist.sh shows
 
       - name: Sync movie ratings
-        continue-on-error: true
         run: |
           ./diff-ratings.sh movie | ./trakt-update-ratings.sh movies
 
       - name: Sync show ratings
-        continue-on-error: true
         run: |
           ./diff-ratings.sh show | ./trakt-update-ratings.sh shows
 
       - name: Sync history
-        continue-on-error: true
         run: |
           ./diff-history.sh | ./trakt-update-history.sh
