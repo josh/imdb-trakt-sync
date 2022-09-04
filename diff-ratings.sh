@@ -3,7 +3,7 @@
 #   {"add":[{"id": "tt0111161","rating":8,"timestamp":"2020-01-01T00:00:00Z"}], "remove":[]}
 
 set -eo pipefail
-[ -n "$ACTIONS_RUNNER_DEBUG" ] && set -x
+[ -n "$RUNNER_DEBUG" ] && set -x
 
 TYPE=${1}
 

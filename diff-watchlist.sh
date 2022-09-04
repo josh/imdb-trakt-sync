@@ -3,7 +3,7 @@
 #   {"add":[{"id": "tt0111161"}], "remove":[]}
 
 set -eo pipefail
-[ -n "$ACTIONS_RUNNER_DEBUG" ] && set -x
+[ -n "$RUNNER_DEBUG" ] && set -x
 
 TYPE=${1}
 

@@ -2,8 +2,8 @@
 # Usage: trakt-update-history <TRAKT_CLIENT_ID> <TRAKT_ACCESS_TOKEN>
 
 set -eo pipefail
-[ -n "$ACTIONS_RUNNER_DEBUG" ] && set -x
-[ -n "$ACTIONS_RUNNER_DEBUG" ] && curl_verbose="--verbose" || curl_verbose="--silent"
+[ -n "$RUNNER_DEBUG" ] && set -x
+[ -n "$RUNNER_DEBUG" ] && curl_verbose="--verbose" || curl_verbose="--silent"
 
 TRAKT_CLIENT_ID=${1:-$TRAKT_CLIENT_ID}
 TRAKT_ACCESS_TOKEN=${2:-$TRAKT_ACCESS_TOKEN}

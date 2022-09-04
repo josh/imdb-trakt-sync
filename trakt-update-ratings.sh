@@ -2,8 +2,8 @@
 # Usage: trakt-update-ratings [movies|shows] <TRAKT_CLIENT_ID> <TRAKT_ACCESS_TOKEN>
 
 set -eo pipefail
-[ -n "$ACTIONS_RUNNER_DEBUG" ] && set -x
-[ -n "$ACTIONS_RUNNER_DEBUG" ] && curl_verbose="--verbose" || curl_verbose="--silent"
+[ -n "$RUNNER_DEBUG" ] && set -x
+[ -n "$RUNNER_DEBUG" ] && curl_verbose="--verbose" || curl_verbose="--silent"
 
 TYPE=${1}
 TRAKT_CLIENT_ID=${2:-$TRAKT_CLIENT_ID}
