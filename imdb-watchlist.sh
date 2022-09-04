@@ -3,6 +3,8 @@
 #   [{"id": "tt0111161"}]
 
 set -eo pipefail
+[ -n "$ACTIONS_RUNNER_DEBUG" ] && set -x
+[ -n "$ACTIONS_RUNNER_DEBUG" ] && curl_verbose="--verbose" || curl_verbose="--silent"
 
 TYPE=${1}
 IMDB_WATCHLIST_ID=${2:-$IMDB_WATCHLIST_ID}
@@ -28,7 +30,7 @@ log() {
 	fi
 }
 
-curl --fail --silent \
+curl --fail "$curl_verbose" \
 	"https://www.imdb.com/list/$IMDB_WATCHLIST_ID/export" |
 	./csv2json.py |
 	jq --arg type "$TITLE_TYPE" 'map(select(.["Title Type"] == $type) | {id: .Const})' |

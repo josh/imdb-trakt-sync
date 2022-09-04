@@ -2,6 +2,8 @@
 # Usage: trakt-update-ratings [movies|shows] <TRAKT_CLIENT_ID> <TRAKT_ACCESS_TOKEN>
 
 set -eo pipefail
+[ -n "$ACTIONS_RUNNER_DEBUG" ] && set -x
+[ -n "$ACTIONS_RUNNER_DEBUG" ] && curl_verbose="--verbose" || curl_verbose="--silent"
 
 TYPE=${1}
 TRAKT_CLIENT_ID=${2:-$TRAKT_CLIENT_ID}
@@ -18,7 +20,7 @@ sleep 1
 jq '.add' </tmp/trakt-update-ratings.json |
 	jq 'map({rating: .rating, rated_at: .timestamp, ids: {imdb: .id}})' |
 	jq --arg type "$TYPE" '{($type): .}' |
-	curl --fail --silent \
+	curl --fail "$curl_verbose" \
 		--request POST \
 		--header "Authorization: Bearer $TRAKT_ACCESS_TOKEN" \
 		--header "Content-Type: application/json" \
@@ -32,7 +34,7 @@ sleep 1
 jq '.remove' </tmp/trakt-update-ratings.json |
 	jq 'map({ids: {imdb: .id}})' |
 	jq --arg type "$TYPE" '{($type): .}' |
-	curl --fail --silent \
+	curl --fail "$curl_verbose" \
 		--request POST \
 		--header "Authorization: Bearer $TRAKT_ACCESS_TOKEN" \
 		--header "Content-Type: application/json" \

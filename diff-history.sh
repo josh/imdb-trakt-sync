@@ -3,6 +3,7 @@
 #   {"add":[{"id": "tt0111161","timestamp":"2020-01-01T00:00:00Z"}]}
 
 set -eo pipefail
+[ -n "$ACTIONS_RUNNER_DEBUG" ] && set -x
 
 log_add() {
 	COUNT=$(jq '.add | length')

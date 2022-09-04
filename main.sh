@@ -1,6 +1,8 @@
 #!/bin/bash
 # Usage: imdb-trakt-sync <command>
 
+[ -n "$ACTIONS_RUNNER_DEBUG" ] && set -x
+
 COMMAND="$1"
 shift
 

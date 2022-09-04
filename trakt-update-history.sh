@@ -2,6 +2,8 @@
 # Usage: trakt-update-history <TRAKT_CLIENT_ID> <TRAKT_ACCESS_TOKEN>
 
 set -eo pipefail
+[ -n "$ACTIONS_RUNNER_DEBUG" ] && set -x
+[ -n "$ACTIONS_RUNNER_DEBUG" ] && curl_verbose="--verbose" || curl_verbose="--silent"
 
 TRAKT_CLIENT_ID=${1:-$TRAKT_CLIENT_ID}
 TRAKT_ACCESS_TOKEN=${2:-$TRAKT_ACCESS_TOKEN}
@@ -15,7 +17,7 @@ sleep 1
 jq '.add' |
 	jq 'map({watched_at: .timestamp, ids: {imdb: .id}})' |
 	jq '{movies: .}' |
-	curl --fail --silent \
+	curl --fail "$curl_verbose" \
 		--request POST \
 		--header "Authorization: Bearer $TRAKT_ACCESS_TOKEN" \
 		--header "Content-Type: application/json" \

@@ -3,6 +3,8 @@
 #   [{"id": "tt0111161", "rating": 10}]
 
 set -eo pipefail
+[ -n "$ACTIONS_RUNNER_DEBUG" ] && set -x
+[ -n "$ACTIONS_RUNNER_DEBUG" ] && curl_verbose="--verbose" || curl_verbose="--silent"
 
 TYPE=${1}
 TRAKT_CLIENT_ID=${2:-$TRAKT_CLIENT_ID}
@@ -20,7 +22,7 @@ log() {
 	fi
 }
 
-curl --fail --silent \
+curl --fail "$curl_verbose" \
 	--header "Authorization: Bearer $TRAKT_ACCESS_TOKEN" \
 	--header "Content-Type: application/json" \
 	--header "trakt-api-version: 2" \

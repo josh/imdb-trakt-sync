@@ -1,6 +1,8 @@
 #!/bin/bash
 # Usage: sync
 
+[ -n "$ACTIONS_RUNNER_DEBUG" ] && set -x
+
 usage() {
 	sed -ne '/^#/!q;s/.\{1,2\}//;1d;p' <"$0"
 	exit 1

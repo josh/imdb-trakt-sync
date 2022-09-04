@@ -3,6 +3,8 @@
 #   {"id": "tt0111161", "rating": 10, "timestamp": "2020-01-01T00:00:00Z"}
 
 set -eo pipefail
+[ -n "$ACTIONS_RUNNER_DEBUG" ] && set -x
+[ -n "$ACTIONS_RUNNER_DEBUG" ] && curl_verbose="--verbose" || curl_verbose="--silent"
 
 TYPE=${1}
 IMDB_RATINGS_ID=${2:-$IMDB_RATINGS_ID}
@@ -30,7 +32,7 @@ log() {
 	fi
 }
 
-curl --fail --silent --cookie "ubid-main=$IMDB_UBID_MAIN; at-main=$IMDB_AT_MAIN" \
+curl --fail "$curl_verbose" --cookie "ubid-main=$IMDB_UBID_MAIN; at-main=$IMDB_AT_MAIN" \
 	"https://www.imdb.com/user/$IMDB_RATINGS_ID/ratings/export" |
 	./csv2json.py |
 	jq --arg type "$TITLE_TYPE" 'map(select(.["Title Type"] | test($type)) | {
