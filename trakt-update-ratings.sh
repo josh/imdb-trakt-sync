@@ -17,7 +17,7 @@ fi
 INPUT="/tmp/trakt-update-ratings.json"
 cat >"$INPUT"
 
-if jq --exit-status '.add | length > 0' <"$INPUT"; then
+if jq --exit-status '.add | length > 0' <"$INPUT" >/dev/null; then
 	sleep 1
 	jq '.add' <"$INPUT" |
 		jq 'map({rating: .rating, rated_at: .timestamp, ids: {imdb: .id}})' |
@@ -33,7 +33,7 @@ if jq --exit-status '.add | length > 0' <"$INPUT"; then
 		jq --arg type "$TYPE" '{added: .added[$type], not_found: .not_found[$type]}'
 fi
 
-if jq --exit-status '.remove | length > 0' <"$INPUT"; then
+if jq --exit-status '.remove | length > 0' <"$INPUT" >/dev/null; then
 	sleep 1
 	jq '.remove' <"$INPUT" |
 		jq 'map({ids: {imdb: .id}})' |

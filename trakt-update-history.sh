@@ -16,7 +16,7 @@ fi
 INPUT="/tmp/trakt-update-history.json"
 cat >"$INPUT"
 
-if jq --exit-status '.add | length > 0' <"$INPUT"; then
+if jq --exit-status '.add | length > 0' <"$INPUT" >/dev/null; then
 	sleep 1
 	jq '.add' <"$INPUT" |
 		jq 'map({watched_at: .timestamp, ids: {imdb: .id}})' |
