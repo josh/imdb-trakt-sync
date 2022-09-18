@@ -13,16 +13,23 @@ if [ -z "$TRAKT_CLIENT_ID" ] || [ -z "$TRAKT_ACCESS_TOKEN" ]; then
 	exit 1
 fi
 
-sleep 1
-jq '.add' |
-	jq 'map({watched_at: .timestamp, ids: {imdb: .id}})' |
-	jq '{movies: .}' |
-	curl --fail "$curl_verbose" \
-		--request POST \
-		--header "Authorization: Bearer $TRAKT_ACCESS_TOKEN" \
-		--header "Content-Type: application/json" \
-		--header "trakt-api-version: 2" \
-		--header "trakt-api-key: $TRAKT_CLIENT_ID" \
-		--data-binary @- \
-		"https://api.trakt.tv/sync/history" |
-	jq '{added: .added.movies, not_found: .not_found.movies}'
+INPUT="/tmp/trakt-update-history.json"
+cat >"$INPUT"
+
+if jq --exit-status '.add | length > 0' <"$INPUT"; then
+	sleep 1
+	jq '.add' <"$INPUT" |
+		jq 'map({watched_at: .timestamp, ids: {imdb: .id}})' |
+		jq '{movies: .}' |
+		curl --fail "$curl_verbose" \
+			--request POST \
+			--header "Authorization: Bearer $TRAKT_ACCESS_TOKEN" \
+			--header "Content-Type: application/json" \
+			--header "trakt-api-version: 2" \
+			--header "trakt-api-key: $TRAKT_CLIENT_ID" \
+			--data-binary @- \
+			"https://api.trakt.tv/sync/history" |
+		jq '{added: .added.movies, not_found: .not_found.movies}'
+fi
+
+rm "$INPUT"

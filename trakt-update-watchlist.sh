@@ -14,34 +14,39 @@ if [ -z "$TRAKT_CLIENT_ID" ] || [ -z "$TRAKT_ACCESS_TOKEN" ]; then
 	exit 1
 fi
 
-cat >/tmp/trakt-update-watchlist.json
+INPUT="/tmp/trakt-update-watchlist.json"
+cat >"$INPUT"
 
-sleep 1
-jq '.add' </tmp/trakt-update-watchlist.json |
-	jq 'map({ids: {imdb: .id}})' |
-	jq --arg type "$TYPE" '{($type): .}' |
-	curl --fail "$curl_verbose" \
-		--request POST \
-		--header "Authorization: Bearer $TRAKT_ACCESS_TOKEN" \
-		--header "Content-Type: application/json" \
-		--header "trakt-api-version: 2" \
-		--header "trakt-api-key: $TRAKT_CLIENT_ID" \
-		--data-binary @- \
-		"https://api.trakt.tv/sync/watchlist" |
-	jq --arg type "$TYPE" '{added: .added[$type], existing: .existing[$type], not_found: .not_found[$type]}'
+if jq --exit-status '.add | length > 0' <"$INPUT"; then
+	sleep 1
+	jq '.add' <"$INPUT" |
+		jq 'map({ids: {imdb: .id}})' |
+		jq --arg type "$TYPE" '{($type): .}' |
+		curl --fail "$curl_verbose" \
+			--request POST \
+			--header "Authorization: Bearer $TRAKT_ACCESS_TOKEN" \
+			--header "Content-Type: application/json" \
+			--header "trakt-api-version: 2" \
+			--header "trakt-api-key: $TRAKT_CLIENT_ID" \
+			--data-binary @- \
+			"https://api.trakt.tv/sync/watchlist" |
+		jq --arg type "$TYPE" '{added: .added[$type], existing: .existing[$type], not_found: .not_found[$type]}'
+fi
 
-sleep 1
-jq '.remove' </tmp/trakt-update-watchlist.json |
-	jq 'map({ids: {imdb: .id}})' |
-	jq --arg type "$TYPE" '{($type): .}' |
-	curl --fail "$curl_verbose" \
-		--request POST \
-		--header "Authorization: Bearer $TRAKT_ACCESS_TOKEN" \
-		--header "Content-Type: application/json" \
-		--header "trakt-api-version: 2" \
-		--header "trakt-api-key: $TRAKT_CLIENT_ID" \
-		--data-binary @- \
-		"https://api.trakt.tv/sync/watchlist/remove" |
-	jq --arg type "$TYPE" '{deleted: .deleted[$type], not_found: .not_found[$type]}'
+if jq --exit-status '.remove | length > 0' <"$INPUT"; then
+	sleep 1
+	jq '.remove' <"$INPUT" |
+		jq 'map({ids: {imdb: .id}})' |
+		jq --arg type "$TYPE" '{($type): .}' |
+		curl --fail "$curl_verbose" \
+			--request POST \
+			--header "Authorization: Bearer $TRAKT_ACCESS_TOKEN" \
+			--header "Content-Type: application/json" \
+			--header "trakt-api-version: 2" \
+			--header "trakt-api-key: $TRAKT_CLIENT_ID" \
+			--data-binary @- \
+			"https://api.trakt.tv/sync/watchlist/remove" |
+		jq --arg type "$TYPE" '{deleted: .deleted[$type], not_found: .not_found[$type]}'
+fi
 
-rm /tmp/trakt-update-watchlist.json
+rm "$INPUT"
