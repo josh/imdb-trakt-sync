@@ -17,7 +17,7 @@ fi
 if [ "$TYPE" == "movie" ]; then
 	TITLE_TYPE="movie"
 elif [ "$TYPE" == "show" ]; then
-	TITLE_TYPE="tvSeries"
+	TITLE_TYPE="tv"
 else
 	sed -ne '/^#/!q;s/.\{1,2\}//;1d;p' <"$0"
 	exit 1
@@ -33,5 +33,5 @@ log() {
 curl --fail "$curl_verbose" \
 	"https://www.imdb.com/list/$IMDB_WATCHLIST_ID/export" |
 	./csv2json.py |
-	jq --arg type "$TITLE_TYPE" 'map(select(.["Title Type"] == $type) | {id: .Const})' |
+	jq --arg type "$TITLE_TYPE" 'map(select(.["Title Type"] | startswith($type)) | {id: .Const})' |
 	tee >(log)
