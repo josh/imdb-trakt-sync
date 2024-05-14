@@ -3,8 +3,8 @@
 #   [{"id": "tt0111161", "rating": 10}]
 
 set -euo pipefail
-[ -n "${RUNNER_DEBUG:-}" ]&& set -x
-[ -n "${RUNNER_DEBUG:-}" ]&& curl_verbose="--verbose" || curl_verbose="--silent"
+[ -n "${RUNNER_DEBUG:-}" ] && set -x
+[ -n "${RUNNER_DEBUG:-}" ] && curl_verbose="--verbose" || curl_verbose="--silent"
 
 TYPE=${1}
 TRAKT_CLIENT_ID=${2:-$TRAKT_CLIENT_ID}

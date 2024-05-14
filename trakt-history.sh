@@ -3,8 +3,8 @@
 #   [{"id": "tt0111161", "timestamp": "2020-01-01T12:00:00Z"}]
 
 set -euo pipefail
-[ -n "${RUNNER_DEBUG:-}" ]&& set -x
-[ -n "${RUNNER_DEBUG:-}" ]&& curl_verbose="--verbose" || curl_verbose="--silent"
+[ -n "${RUNNER_DEBUG:-}" ] && set -x
+[ -n "${RUNNER_DEBUG:-}" ] && curl_verbose="--verbose" || curl_verbose="--silent"
 
 TRAKT_CLIENT_ID=${1:-$TRAKT_CLIENT_ID}
 TRAKT_ACCESS_TOKEN=${2:-$TRAKT_ACCESS_TOKEN}

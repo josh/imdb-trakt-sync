@@ -3,8 +3,8 @@
 #   {"id": "tt0111161", "rating": 10, "timestamp": "2020-01-01T00:00:00Z"}
 
 set -euo pipefail
-[ -n "${RUNNER_DEBUG:-}" ]&& set -x
-[ -n "${RUNNER_DEBUG:-}" ]&& curl_verbose="--verbose" || curl_verbose="--silent"
+[ -n "${RUNNER_DEBUG:-}" ] && set -x
+[ -n "${RUNNER_DEBUG:-}" ] && curl_verbose="--verbose" || curl_verbose="--silent"
 
 TYPE=${1}
 IMDB_RATINGS_ID=${2:-$IMDB_RATINGS_ID}
