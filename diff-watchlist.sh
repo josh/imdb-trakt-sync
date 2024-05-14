@@ -2,8 +2,8 @@
 # Usage: diff-watchlist [movie|show]
 #   {"add":[{"id": "tt0111161"}], "remove":[]}
 
-set -eo pipefail
-[ -n "$RUNNER_DEBUG" ] && set -x
+set -euo pipefail
+[ -n "${RUNNER_DEBUG:-}" ]&& set -x
 
 TYPE=${1}
 

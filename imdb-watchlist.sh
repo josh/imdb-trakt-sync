@@ -2,9 +2,9 @@
 # Usage: imdb-watchlist [movie|show] <IMDB_WATCHLIST_ID>
 #   [{"id": "tt0111161"}]
 
-set -eo pipefail
-[ -n "$RUNNER_DEBUG" ] && set -x
-[ -n "$RUNNER_DEBUG" ] && curl_verbose="--verbose" || curl_verbose="--silent"
+set -euo pipefail
+[ -n "${RUNNER_DEBUG:-}" ]&& set -x
+[ -n "${RUNNER_DEBUG:-}" ]&& curl_verbose="--verbose" || curl_verbose="--silent"
 
 TYPE=${1}
 IMDB_WATCHLIST_ID=${2:-$IMDB_WATCHLIST_ID}

@@ -2,8 +2,8 @@
 # Usage: diff-ratings [movie|show]
 #   {"add":[{"id": "tt0111161","rating":8,"timestamp":"2020-01-01T00:00:00Z"}], "remove":[]}
 
-set -eo pipefail
-[ -n "$RUNNER_DEBUG" ] && set -x
+set -euo pipefail
+[ -n "${RUNNER_DEBUG:-}" ] && set -x
 
 TYPE=${1}
 

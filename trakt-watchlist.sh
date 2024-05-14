@@ -2,9 +2,9 @@
 # Usage: trakt-watchlist [movie|show] <TRAKT_CLIENT_ID> <TRAKT_ACCESS_TOKEN>
 #   [{"id": "tt0111161"}]
 
-set -eo pipefail
-[ -n "$RUNNER_DEBUG" ] && set -x
-[ -n "$RUNNER_DEBUG" ] && curl_verbose="--verbose" || curl_verbose="--silent"
+set -euo pipefail
+[ -n "${RUNNER_DEBUG:-}" ] && set -x
+[ -n "${RUNNER_DEBUG:-}" ] && curl_verbose="--verbose" || curl_verbose="--silent"
 
 TYPE=${1}
 TRAKT_CLIENT_ID=${2:-$TRAKT_CLIENT_ID}
