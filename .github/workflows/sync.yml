@@ -10,6 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     concurrency: sync
 
+    env:
+      IMDB_WATCHLIST_URL: ${{ secrets.IMDB_WATCHLIST_URL }}
+
     steps:
       - name: Checkout main branch
         uses: actions/checkout@v4
