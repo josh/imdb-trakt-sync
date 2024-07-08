@@ -1,0 +1,31 @@
+name: Sync
+
+on:
+  schedule:
+    - cron: "0 8 * * *"
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    concurrency: sync
+
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: "pyproject.toml"
+
+      - name: Install uv
+        run: pipx install uv
+
+      - name: Install dependencies
+        run: |
+          uv pip install --system --constraint requirements.txt '.'
+
+      - name: Sync
+        run: |
+          imdb-trakt-sync --help
