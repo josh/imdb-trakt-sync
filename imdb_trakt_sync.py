@@ -1,4 +1,5 @@
 import csv
+import json
 import logging
 from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
@@ -301,6 +302,14 @@ def trakt_session(client_id: str, access_token: str) -> requests.Session:
     return session
 
 
+class TraktRatelimit(TypedDict):
+    name: str
+    period: int
+    limit: int
+    remaining: int
+    until: str
+
+
 def trakt_request(
     session: requests.Session,
     method: Literal["GET", "POST", "PUT", "DELETE"],
@@ -316,6 +325,15 @@ def trakt_request(
     last_request = now
     response = session.request(method, url, **kwargs)
     response.raise_for_status()
+
+    ratelimit: TraktRatelimit = json.loads(response.headers["x-ratelimit"])
+    if ratelimit["remaining"] < ratelimit["limit"] * 0.25:
+        logger.warning("Rate limit < 25%% remaining: %s", ratelimit)
+        sleep(10)
+    elif ratelimit["remaining"] < ratelimit["limit"] * 0.10:
+        logger.error("Rate limit < 10%% remaining: %s", ratelimit)
+        sleep(60)
+
     return response
 
 
