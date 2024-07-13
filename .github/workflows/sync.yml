@@ -40,4 +40,4 @@ jobs:
         env:
           TRAKT_CLIENT_ID: ${{ secrets.TRAKT_CLIENT_ID }}
           TRAKT_ACCESS_TOKEN: ${{ secrets.TRAKT_ACCESS_TOKEN }}
-          IMDB_RATINGS_URL: ${{ secrets.IMDB_WATCHLIST_URL }}
+          IMDB_RATINGS_URL: ${{ secrets.IMDB_RATINGS_URL }}
