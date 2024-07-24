@@ -8,7 +8,7 @@ click==8.1.7
     # via imdb-trakt-sync (pyproject.toml)
 idna==3.7
     # via requests
-mypy==1.10.1
+mypy==1.11.0
     # via imdb-trakt-sync (pyproject.toml)
 mypy-extensions==1.0.0
     # via mypy
