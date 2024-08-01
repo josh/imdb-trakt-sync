@@ -41,3 +41,11 @@ jobs:
           TRAKT_CLIENT_ID: ${{ secrets.TRAKT_CLIENT_ID }}
           TRAKT_ACCESS_TOKEN: ${{ secrets.TRAKT_ACCESS_TOKEN }}
           IMDB_RATINGS_URL: ${{ secrets.IMDB_RATINGS_URL }}
+
+      - name: Sync history
+        run: |
+          imdb-trakt-sync --verbose sync-history
+        env:
+          TRAKT_CLIENT_ID: ${{ secrets.TRAKT_CLIENT_ID }}
+          TRAKT_ACCESS_TOKEN: ${{ secrets.TRAKT_ACCESS_TOKEN }}
+          IMDB_RATINGS_URL: ${{ secrets.IMDB_RATINGS_URL }}
