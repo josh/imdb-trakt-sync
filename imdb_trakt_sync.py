@@ -1,9 +1,8 @@
 import csv
-import json
 import logging
 from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
-from datetime import date, datetime, time, timedelta
+from datetime import date, datetime, time
 from pathlib import Path
 from time import sleep
 from typing import Any, Literal, TypedDict
@@ -12,9 +11,6 @@ import click
 import requests
 
 logger = logging.getLogger("imdb-trakt-sync")
-
-last_request: datetime = datetime(1970, 1, 1)
-_MIN_TIME_BETWEEN_REQUESTS = timedelta(seconds=3)
 
 _NOW: datetime = datetime.now()
 _END_OF_DAY_TIME: time = time(hour=23, minute=59, second=59)
@@ -316,23 +312,12 @@ def trakt_request(
     url: str,
     **kwargs: Any,
 ) -> requests.Response:
-    global last_request
-    now = datetime.now()
-    wait = last_request + _MIN_TIME_BETWEEN_REQUESTS - now
-    if wait.total_seconds() > 0:
-        logger.debug("Sleeping for %s", wait)
-        sleep(wait.total_seconds())
-    last_request = now
     response = session.request(method, url, **kwargs)
     response.raise_for_status()
 
-    ratelimit: TraktRatelimit = json.loads(response.headers["x-ratelimit"])
-    if ratelimit["remaining"] < ratelimit["limit"] * 0.25:
-        logger.warning("Rate limit < 25%% remaining: %s", ratelimit)
-        sleep(10)
-    elif ratelimit["remaining"] < ratelimit["limit"] * 0.10:
-        logger.error("Rate limit < 10%% remaining: %s", ratelimit)
-        sleep(60)
+    if method != "GET":
+        logger.debug("Sleeping for 1 sec")
+        sleep(1)
 
     return response
 
