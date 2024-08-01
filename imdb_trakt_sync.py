@@ -59,7 +59,7 @@ def main(
 def sync_watchlist(session: requests.Session, imdb_watchlist_url: str) -> None:
     items = fetch_imdb_watchlist(imdb_watchlist_url)
 
-    existing_media_items = trakt_watchlist(session)
+    existing_media_items = list(trakt_watchlist(session))
     existing_movie_imdb_ids: set[str] = _compact_set(
         _trakt_mediaitem_imdb_id(item)
         for item in existing_media_items
