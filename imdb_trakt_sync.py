@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from datetime import date, datetime, time
 from pathlib import Path
 from time import sleep
-from typing import Any, Literal, TypedDict
+from typing import Any, Literal, TypedDict, cast
 
 import click
 import requests
@@ -90,6 +90,13 @@ def sync_watchlist(session: requests.Session, imdb_watchlist_url: str) -> None:
     remove_shows: list[TraktAnyItem] = [
         {"ids": {"imdb": imdb}} for imdb in existing_show_imdb_ids - imdb_show_ids
     ]
+
+    if watching_item := trakt_watching(session):
+        logger.debug("Filtering out currently watching...")
+        add_movies = list(_block_watching_items(add_movies, watching_item))
+        add_shows = list(_block_watching_items(add_shows, watching_item))
+        remove_movies = list(_block_watching_items(remove_movies, watching_item))
+        remove_shows = list(_block_watching_items(remove_shows, watching_item))
 
     trakt_update_watchlist(session, movies=add_movies, shows=add_shows)
     trakt_remove_from_watchlist(session, movies=remove_movies, shows=remove_shows)
@@ -205,6 +212,17 @@ def sync_history(session: requests.Session, imdb_ratings_url: str) -> None:
         for imdb in imdb_episode_ids - existing_episodes_imdb_ids
     ]
 
+    if watching_item := trakt_watching(session):
+        logger.debug("Filtering out currently watching...")
+        add_movies = cast(
+            list[TraktWatchedItem],
+            list(_block_watching_items(add_movies, watching_item)),
+        )
+        add_episodes = cast(
+            list[TraktWatchedItem],
+            list(_block_watching_items(add_episodes, watching_item)),
+        )
+
     trakt_add_history(session, movies=add_movies, episodes=add_episodes)
 
 
@@ -300,10 +318,19 @@ class TraktWatchlistItem(TypedDict):
     episode: TraktAnyItem
 
 
-class TraktRatedItem(TypedDict):
+class TraktRatedItem(TraktAnyItem):
     rated_at: str
     rating: int
-    ids: TraktIMDBIDs
+
+
+class TraktWatchingItem(TypedDict):
+    expires_at: str
+    started_at: str
+    action: Literal["scrobble", "checkin", "watch"]
+    type: Literal["movie", "episode"]
+    movie: TraktAnyItem
+    episode: TraktAnyItem
+    show: TraktAnyItem
 
 
 class TraktHistoryItem(TypedDict):
@@ -315,9 +342,8 @@ class TraktHistoryItem(TypedDict):
     episode: TraktAnyItem
 
 
-class TraktWatchedItem(TypedDict):
+class TraktWatchedItem(TraktAnyItem):
     watched_at: str
-    ids: TraktIMDBIDs
 
 
 class TraktRatingItem(TypedDict):
@@ -514,6 +540,58 @@ def trakt_remove_from_watchlist(
                     "https://www.imdb.com/title/%s/ not found on Trakt",
                     item["ids"]["imdb"],
                 )
+
+
+def trakt_watching(session: requests.Session) -> TraktWatchingItem | None:
+    response = trakt_request(
+        session,
+        method="GET",
+        url="https://api.trakt.tv/users/me/watching",
+    )
+    if response.status_code == 200:
+        data: TraktWatchingItem = response.json()
+        return data
+    elif response.status_code == 204:
+        return None
+    else:
+        response.raise_for_status()
+        return None
+
+
+def trakt_watching_imdb_id(session: requests.Session) -> str | None:
+    if watching := trakt_watching(session):
+        if watching["type"] == "movie":
+            return watching["movie"]["ids"]["imdb"]
+        elif watching["type"] == "episode":
+            return watching["episode"]["ids"]["imdb"]
+    return None
+
+
+def _block_watching_items(
+    items: Iterable[TraktAnyItem],
+    watching: TraktWatchingItem | None,
+) -> Iterator[TraktAnyItem]:
+    if watching is None:
+        yield from items
+        return
+
+    if watching["type"] == "movie":
+        watching_imdb_id = watching["movie"]["ids"]["imdb"]
+    elif watching["type"] == "episode":
+        watching_imdb_id = watching["episode"]["ids"]["imdb"]
+    else:
+        yield from items
+        return
+
+    for item in items:
+        if item["ids"].get("imdb") == watching_imdb_id:
+            logger.warning(
+                "https://www.imdb.com/title/%s/ is currently being watched, ignoring",
+                watching_imdb_id,
+            )
+            continue
+        else:
+            yield item
 
 
 def trakt_ratings(
