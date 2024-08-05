@@ -28,7 +28,7 @@ jobs:
 
       - name: Sync watchlist
         run: |
-          imdb-trakt-sync --verbose sync-watchlist
+          imdb-trakt-sync sync-watchlist
         env:
           TRAKT_CLIENT_ID: ${{ secrets.TRAKT_CLIENT_ID }}
           TRAKT_ACCESS_TOKEN: ${{ secrets.TRAKT_ACCESS_TOKEN }}
@@ -36,7 +36,7 @@ jobs:
 
       - name: Sync ratings
         run: |
-          imdb-trakt-sync --verbose sync-ratings
+          imdb-trakt-sync sync-ratings
         env:
           TRAKT_CLIENT_ID: ${{ secrets.TRAKT_CLIENT_ID }}
           TRAKT_ACCESS_TOKEN: ${{ secrets.TRAKT_ACCESS_TOKEN }}
@@ -44,7 +44,7 @@ jobs:
 
       - name: Sync history
         run: |
-          imdb-trakt-sync --verbose sync-history
+          imdb-trakt-sync sync-history
         env:
           TRAKT_CLIENT_ID: ${{ secrets.TRAKT_CLIENT_ID }}
           TRAKT_ACCESS_TOKEN: ${{ secrets.TRAKT_ACCESS_TOKEN }}
