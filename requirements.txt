@@ -16,7 +16,7 @@ requests==2.32.3
     # via imdb-trakt-sync (pyproject.toml)
 ruff==0.7.2
     # via imdb-trakt-sync (pyproject.toml)
-tomli==2.0.2
+tomli==2.1.0
     # via mypy
 types-requests==2.32.0.20240712
     # via imdb-trakt-sync (pyproject.toml)
