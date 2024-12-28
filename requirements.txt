@@ -2,7 +2,7 @@
 #    uv pip compile pyproject.toml --all-extras --output-file requirements.txt
 certifi==2024.12.14
     # via requests
-charset-normalizer==3.4.0
+charset-normalizer==3.4.1
     # via requests
 click==8.1.8
     # via imdb-trakt-sync (pyproject.toml)
@@ -14,11 +14,9 @@ mypy-extensions==1.0.0
     # via mypy
 requests==2.32.3
     # via imdb-trakt-sync (pyproject.toml)
-ruff==0.8.0
+ruff==0.8.4
     # via imdb-trakt-sync (pyproject.toml)
-tomli==2.2.1
-    # via mypy
-types-requests==2.32.0.20240712
+types-requests==2.32.0.20241016
     # via imdb-trakt-sync (pyproject.toml)
 typing-extensions==4.12.2
     # via mypy
