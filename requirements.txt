@@ -14,7 +14,7 @@ mypy-extensions==1.0.0
     # via mypy
 requests==2.32.3
     # via imdb-trakt-sync (pyproject.toml)
-ruff==0.8.4
+ruff==0.9.1
     # via imdb-trakt-sync (pyproject.toml)
 types-requests==2.32.0.20241016
     # via imdb-trakt-sync (pyproject.toml)
