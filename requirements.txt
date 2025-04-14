@@ -20,7 +20,7 @@ types-requests==2.32.0.20241016
     # via imdb-trakt-sync (pyproject.toml)
 typing-extensions==4.13.2
     # via mypy
-urllib3==2.3.0
+urllib3==2.4.0
     # via
     #   requests
     #   types-requests
