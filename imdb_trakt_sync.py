@@ -455,12 +455,11 @@ def _trakt_pagination(response: requests.Response) -> TraktPagination:
     )
 
 
-def trakt_watchlist(session: requests.Session) -> Iterator[TraktWatchlistItem]:
-    yield from trakt_request_paginated(
+def trakt_watchlist(session: requests.Session) -> list[TraktWatchlistItem]:
+    return trakt_request(
         session,
         method="GET",
         url=_TRAKT_WATCHLIST_URL,
-        limit=1000,
     )
 
 
@@ -597,13 +596,13 @@ def _block_watching_items(
 def trakt_ratings(
     session: requests.Session,
     media_type: Literal["movies", "shows", "seasons", "episodes", "all"] = "all",
-) -> Iterator[TraktRatingItem]:
-    yield from trakt_request_paginated(
+) -> list[TraktRatingItem]:
+    response = trakt_request(
         session,
         method="GET",
         url=f"{_TRAKT_RATINGS_URL}/{media_type}",
-        limit=1000,
     )
+    return response.json()
 
 
 def trakt_add_ratings(
