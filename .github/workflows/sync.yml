@@ -31,7 +31,7 @@ jobs:
         env:
           TRAKT_CLIENT_ID: ${{ secrets.TRAKT_CLIENT_ID }}
           TRAKT_ACCESS_TOKEN: ${{ secrets.TRAKT_ACCESS_TOKEN }}
-          IMDB_WATCHLIST_URL: ${{ secrets.IMDB_WATCHLIST_URL }}
+          IMDB_WATCHLIST_URL: ${{ vars.IMDB_WATCHLIST_URL }}
 
       - name: Sync ratings
         run: |
@@ -39,7 +39,7 @@ jobs:
         env:
           TRAKT_CLIENT_ID: ${{ secrets.TRAKT_CLIENT_ID }}
           TRAKT_ACCESS_TOKEN: ${{ secrets.TRAKT_ACCESS_TOKEN }}
-          IMDB_RATINGS_URL: ${{ secrets.IMDB_RATINGS_URL }}
+          IMDB_RATINGS_URL: ${{ vars.IMDB_RATINGS_URL }}
 
       - name: Sync history
         run: |
@@ -47,4 +47,4 @@ jobs:
         env:
           TRAKT_CLIENT_ID: ${{ secrets.TRAKT_CLIENT_ID }}
           TRAKT_ACCESS_TOKEN: ${{ secrets.TRAKT_ACCESS_TOKEN }}
-          IMDB_RATINGS_URL: ${{ secrets.IMDB_RATINGS_URL }}
+          IMDB_RATINGS_URL: ${{ vars.IMDB_RATINGS_URL }}
