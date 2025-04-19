@@ -55,8 +55,17 @@ def main(
     required=True,
     envvar="IMDB_WATCHLIST_URL",
 )
+@click.option(
+    "--dry-run",
+    is_flag=True,
+    help="Enable dry run mode",
+)
 @click.pass_obj
-def sync_watchlist(session: requests.Session, imdb_watchlist_url: str) -> None:
+def sync_watchlist(
+    session: requests.Session,
+    imdb_watchlist_url: str,
+    dry_run: bool,
+) -> None:
     items = fetch_imdb_watchlist(imdb_watchlist_url)
 
     existing_media_items = list(trakt_watchlist(session))
@@ -98,8 +107,18 @@ def sync_watchlist(session: requests.Session, imdb_watchlist_url: str) -> None:
         remove_movies = list(_block_watching_items(remove_movies, watching_item))
         remove_shows = list(_block_watching_items(remove_shows, watching_item))
 
-    trakt_update_watchlist(session, movies=add_movies, shows=add_shows)
-    trakt_remove_from_watchlist(session, movies=remove_movies, shows=remove_shows)
+    trakt_update_watchlist(
+        session,
+        movies=add_movies,
+        shows=add_shows,
+        dry_run=dry_run,
+    )
+    trakt_remove_from_watchlist(
+        session,
+        movies=remove_movies,
+        shows=remove_shows,
+        dry_run=dry_run,
+    )
 
 
 @main.command()
@@ -108,8 +127,17 @@ def sync_watchlist(session: requests.Session, imdb_watchlist_url: str) -> None:
     required=True,
     envvar="IMDB_RATINGS_URL",
 )
+@click.option(
+    "--dry-run",
+    is_flag=True,
+    help="Enable dry run mode",
+)
 @click.pass_obj
-def sync_ratings(session: requests.Session, imdb_ratings_url: str) -> None:
+def sync_ratings(
+    session: requests.Session,
+    imdb_ratings_url: str,
+    dry_run: bool,
+) -> None:
     imdb_ratings = fetch_imdb_ratings(imdb_ratings_url)
 
     trakt_rated_at: dict[str, datetime] = {}
@@ -172,7 +200,12 @@ def sync_ratings(session: requests.Session, imdb_ratings_url: str) -> None:
             trakt_rated_at[imdb_id],
         )
 
-    trakt_add_ratings(session=session, movies=add_movies, shows=add_shows)
+    trakt_add_ratings(
+        session=session,
+        movies=add_movies,
+        shows=add_shows,
+        dry_run=dry_run,
+    )
 
 
 @main.command()
@@ -181,8 +214,17 @@ def sync_ratings(session: requests.Session, imdb_ratings_url: str) -> None:
     required=True,
     envvar="IMDB_RATINGS_URL",
 )
+@click.option(
+    "--dry-run",
+    is_flag=True,
+    help="Enable dry run mode",
+)
 @click.pass_obj
-def sync_history(session: requests.Session, imdb_ratings_url: str) -> None:
+def sync_history(
+    session: requests.Session,
+    imdb_ratings_url: str,
+    dry_run: bool,
+) -> None:
     existing_movie_imdb_ids: set[str] = set()
     existing_episodes_imdb_ids: set[str] = set()
 
@@ -223,7 +265,12 @@ def sync_history(session: requests.Session, imdb_ratings_url: str) -> None:
             list(_block_watching_items(add_episodes, watching_item)),
         )
 
-    trakt_add_history(session, movies=add_movies, episodes=add_episodes)
+    trakt_add_history(
+        session,
+        movies=add_movies,
+        episodes=add_episodes,
+        dry_run=dry_run,
+    )
 
 
 @dataclass
@@ -470,9 +517,20 @@ def trakt_update_watchlist(
     shows: list[TraktAnyItem] = [],
     seasons: list[TraktAnyItem] = [],
     episodes: list[TraktAnyItem] = [],
+    dry_run: bool = False,
 ) -> None:
     if not movies and not shows and not seasons and not episodes:
         logger.debug("No items to update")
+        return
+    if dry_run:
+        if movies:
+            logger.warning("[DRY RUN] Would add %d movies", len(movies))
+        if shows:
+            logger.warning("[DRY RUN] Would add %d shows", len(shows))
+        if seasons:
+            logger.warning("[DRY RUN] Would add %d seasons", len(seasons))
+        if episodes:
+            logger.warning("[DRY RUN] Would add %d episodes", len(episodes))
         return
 
     data = {
@@ -511,9 +569,20 @@ def trakt_remove_from_watchlist(
     shows: list[TraktAnyItem] = [],
     seasons: list[TraktAnyItem] = [],
     episodes: list[TraktAnyItem] = [],
+    dry_run: bool = False,
 ) -> None:
     if not movies and not shows and not seasons and not episodes:
         logger.debug("No items to remove")
+        return
+    if dry_run:
+        if movies:
+            logger.warning("[DRY RUN] Would remove %d movies", len(movies))
+        if shows:
+            logger.warning("[DRY RUN] Would remove %d shows", len(shows))
+        if seasons:
+            logger.warning("[DRY RUN] Would remove %d seasons", len(seasons))
+        if episodes:
+            logger.warning("[DRY RUN] Would remove %d episodes", len(episodes))
         return
 
     data = {
@@ -612,9 +681,20 @@ def trakt_add_ratings(
     shows: list[TraktRatedItem] = [],
     seasons: list[TraktRatedItem] = [],
     episodes: list[TraktRatedItem] = [],
+    dry_run: bool = False,
 ) -> None:
     if not movies and not shows and not seasons and not episodes:
         logger.debug("No items to rate")
+        return
+    if dry_run:
+        if movies:
+            logger.warning("[DRY RUN] Would rate %d movies", len(movies))
+        if shows:
+            logger.warning("[DRY RUN] Would rate %d shows", len(shows))
+        if seasons:
+            logger.warning("[DRY RUN] Would rate %d seasons", len(seasons))
+        if episodes:
+            logger.warning("[DRY RUN] Would rate %d episodes", len(episodes))
         return
 
     data = {
@@ -703,9 +783,20 @@ def trakt_add_history(
     shows: list[TraktWatchedItem] = [],
     seasons: list[TraktWatchedItem] = [],
     episodes: list[TraktWatchedItem] = [],
+    dry_run: bool = False,
 ) -> None:
     if not movies and not shows and not seasons and not episodes:
         logger.debug("No items to add")
+        return
+    if dry_run:
+        if movies:
+            logger.warning("[DRY RUN] Would add %d movies", len(movies))
+        if shows:
+            logger.warning("[DRY RUN] Would add %d shows", len(shows))
+        if seasons:
+            logger.warning("[DRY RUN] Would add %d seasons", len(seasons))
+        if episodes:
+            logger.warning("[DRY RUN] Would add %d episodes", len(episodes))
         return
 
     data = {
