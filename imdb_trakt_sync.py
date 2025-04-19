@@ -1,5 +1,7 @@
 import csv
 import logging
+import os
+import sys
 from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
 from datetime import date, datetime, time
@@ -846,6 +848,27 @@ def _compact_set(s: Iterable[str | None]) -> set[str]:
 def _fromisoformat(s: str) -> datetime:
     assert s.endswith("Z")
     return datetime.fromisoformat(s[:-1])
+
+
+class GitHubActionsFormatter(logging.Formatter):
+    def format(self, record: logging.LogRecord) -> str:
+        if record.levelno >= 40:
+            levelname = "error"
+        elif record.levelno >= 30:
+            levelname = "warning"
+        elif record.levelno >= 20:
+            levelname = "notice"
+        else:
+            levelname = "debug"
+        title = f"{record.module}.{record.funcName}"
+        message = record.getMessage()
+        return f"::{levelname} file={record.filename},line={record.lineno},title={title}::{message}"
+
+
+if os.environ.get("GITHUB_ACTIONS") == "true":
+    handler = logging.StreamHandler(sys.stderr)
+    handler.setFormatter(GitHubActionsFormatter())
+    logger.addHandler(handler)
 
 
 if __name__ == "__main__":
