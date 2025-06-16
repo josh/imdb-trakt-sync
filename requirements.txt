@@ -18,7 +18,7 @@ ruff==0.11.0
     # via imdb-trakt-sync (pyproject.toml)
 types-requests==2.32.0.20241016
     # via imdb-trakt-sync (pyproject.toml)
-typing-extensions==4.13.2
+typing-extensions==4.14.0
     # via mypy
 urllib3==2.4.0
     # via
