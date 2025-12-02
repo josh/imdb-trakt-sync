@@ -1,43 +1,46 @@
 [build-system]
-requires = ["hatchling"]
 build-backend = "hatchling.build"
+requires = [ "hatchling" ]
 
 [project]
 name = "imdb-trakt-sync"
 version = "0.1.0"
 readme = "README.md"
-authors = [{ name = "Joshua Peek" }]
+authors = [ { name = "Joshua Peek" } ]
 requires-python = ">=3.10"
-dependencies = [
-    "click>=8.0.0,<9.0",
-    "requests>=2.0.0,<3.0",
-]
 classifiers = [
     "Development Status :: 4 - Beta",
     "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Typing :: Typed",
+]
+
+dependencies = [
+    "click>=8,<9",
+    "requests>=2,<3",
+]
+scripts.imdb-trakt-sync = "imdb_trakt_sync:main"
+
+[dependency-groups]
+dev = [
+    "mypy>=1,<2",
+    "ruff>=0.5",
+    "types-requests>=2,<3",
 ]
 
 [tool.hatch.build.targets.wheel.force-include]
 "imdb_trakt_sync.py" = "imdb_trakt_sync/__init__.py"
 
-[project.scripts]
-imdb-trakt-sync = "imdb_trakt_sync:main"
+[tool.ruff]
+lint.extend-select = [ "I", "UP" ]
 
-[dependency-groups]
-dev = [
-    "mypy>=1.0.0,<2.0",
-    "ruff>=0.5.0",
-    "types-requests>=2.0.0,<3.0",
-]
-
-[tool.ruff.lint]
-extend-select = ["I", "UP"]
+[tool.pyproject-fmt]
+indent = 4
 
 [tool.mypy]
 strict = true
