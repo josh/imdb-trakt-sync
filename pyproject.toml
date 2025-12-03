@@ -22,7 +22,7 @@ classifiers = [
 ]
 
 dependencies = [
-    "click>=8,<9",
+    "click>=8.1.1,<9",
     "requests>=2,<3",
 ]
 scripts.imdb-trakt-sync = "imdb_trakt_sync:main"
@@ -30,7 +30,7 @@ scripts.imdb-trakt-sync = "imdb_trakt_sync:main"
 [dependency-groups]
 dev = [
     "mypy>=1,<2",
-    "ruff>=0.5",
+    "ruff>=0.5,<2",
     "types-requests>=2,<3",
 ]
 
