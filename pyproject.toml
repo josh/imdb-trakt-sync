@@ -31,7 +31,7 @@ scripts.imdb-trakt-sync = "imdb_trakt_sync:main"
 dev = [
     "mypy>=1,<2",
     "ruff>=0.5,<2",
-    "types-requests>=2,<3",
+    "types-requests>=2.33.0.20260327,<3",
 ]
 
 [tool.hatch.build.targets.wheel.force-include]
