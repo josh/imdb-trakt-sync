@@ -13,18 +13,34 @@ jobs:
       - uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         id: app-token
         with:
-          app-id: ${{ vars.GH_APP_ID }}
+          client-id: ${{ vars.GH_APP_ID }}
           private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
 
       - name: Refresh Trakt token
         run: |
-          curl --silent --fail \
-              -X POST \
-              -F "client_id=$TRAKT_CLIENT_ID" \
-              -F "client_secret=$TRAKT_CLIENT_SECRET" \
-              -F "refresh_token=$TRAKT_REFRESH_TOKEN" \
-              -F "grant_type=refresh_token" \
-            'https://api.trakt.tv/oauth/token' >token.json
+          status=$(curl --silent --show-error \
+              --request POST \
+              --header 'Content-Type: application/json' \
+              --output token.json \
+              --write-out '%{http_code}' \
+              --data @- \
+              'https://api.trakt.tv/oauth/token' <<EOF
+          {
+            "client_id": "$TRAKT_CLIENT_ID",
+            "client_secret": "$TRAKT_CLIENT_SECRET",
+            "refresh_token": "$TRAKT_REFRESH_TOKEN",
+            "grant_type": "refresh_token"
+          }
+          EOF
+          )
+
+          if [ "$status" -lt 200 ] || [ "$status" -ge 300 ]; then
+            echo "Trakt token refresh failed with HTTP $status" >&2
+            jq --raw-output '.error_description // .error // .' token.json >&2
+            exit 1
+          fi
+
+          jq --exit-status '.access_token and .refresh_token' token.json >/dev/null
         env:
           TRAKT_CLIENT_ID: ${{ secrets.TRAKT_CLIENT_ID }}
           TRAKT_CLIENT_SECRET: ${{ secrets.TRAKT_CLIENT_SECRET }}
