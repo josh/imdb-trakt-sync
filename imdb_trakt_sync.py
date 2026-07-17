@@ -5,6 +5,7 @@ import sys
 from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
 from datetime import date, datetime, time
+from importlib.metadata import version
 from pathlib import Path
 from time import sleep
 from typing import Any, Literal, TypedDict, TypeVar, cast
@@ -13,6 +14,8 @@ import click
 import requests
 
 logger = logging.getLogger("imdb-trakt-sync")
+
+_VERSION = version("imdb-trakt-sync")
 
 _NOW: datetime = datetime.now()
 _END_OF_DAY_TIME: time = time(hour=23, minute=59, second=59)
@@ -424,6 +427,7 @@ class TraktTypedContainer(TypedDict):
 
 _TRAKT_API_HEADERS = {
     "Content-Type": "application/json",
+    "User-Agent": f"imdb-trakt-sync/{_VERSION}",
     "trakt-api-key": "",
     "trakt-api-version": "2",
     "Authorization": "Bearer [access_token]",
