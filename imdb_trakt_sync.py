@@ -558,7 +558,8 @@ def trakt_request_paginated(
 
         yield from json.loads(response["body"])
 
-        page_count = int(response["headers"]["X-Pagination-Page-Count"])
+        page_count_header = response["headers"].get("X-Pagination-Page-Count")
+        page_count = int(page_count_header) if page_count_header else page
         if page >= page_count:
             break
         page += 1
