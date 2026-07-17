@@ -12,7 +12,7 @@ from http.client import HTTPMessage
 from importlib.metadata import version
 from pathlib import Path
 from time import sleep
-from typing import Any, Literal, TypedDict, TypeVar, cast
+from typing import Any, Literal, TypedDict, cast
 
 import click
 
@@ -124,9 +124,6 @@ def sync_watchlist(
         remove_movies = list(_block_watching_items(remove_movies, watching_item))
         remove_shows = list(_block_watching_items(remove_shows, watching_item))
 
-    add_movies = list(_filter_unknown_imdb_ids(session, add_movies, type="movie"))
-    add_shows = list(_filter_unknown_imdb_ids(session, add_shows, type="show"))
-
     trakt_update_watchlist(
         session,
         movies=add_movies,
@@ -220,9 +217,6 @@ def sync_ratings(
             trakt_rated_at[imdb_id],
         )
 
-    add_movies = list(_filter_unknown_imdb_ids(session, add_movies, type="movie"))
-    add_shows = list(_filter_unknown_imdb_ids(session, add_shows, type="show"))
-
     trakt_add_ratings(
         session=session,
         movies=add_movies,
@@ -287,9 +281,6 @@ def sync_history(
             list[TraktWatchedItem],
             list(_block_watching_items(add_episodes, watching_item)),
         )
-
-    add_movies = list(_filter_unknown_imdb_ids(session, add_movies, type="movie"))
-    add_episodes = list(_filter_unknown_imdb_ids(session, add_episodes, type="episode"))
 
     trakt_add_history(
         session,
@@ -446,7 +437,6 @@ _TRAKT_RATINGS_URL = "https://api.trakt.tv/sync/ratings"
 _TRAKT_HISTORY_URL = "https://api.trakt.tv/sync/history"
 _TRAKT_ADD_RATINGS_URL = "https://api.trakt.tv/sync/ratings"
 _TRAKT_REMOVE_RATINGS_URL = "https://api.trakt.tv/sync/ratings/remove"
-_TRAKT_SEARCH_URL = "https://api.trakt.tv/search"
 
 _MAX_RETRIES = 5
 _BACKOFF_SECONDS = 2
@@ -720,30 +710,6 @@ def _block_watching_items(
             continue
         else:
             yield item
-
-
-T_TraktAnyItem = TypeVar("T_TraktAnyItem", bound=TraktAnyItem)
-
-
-def _filter_unknown_imdb_ids(
-    session: TraktSession,
-    items: Iterable[T_TraktAnyItem],
-    type: Literal["movie", "show", "episode"],
-) -> Iterator[T_TraktAnyItem]:
-    for item in items:
-        imdb_id = item["ids"]["imdb"]
-        response = trakt_request(
-            session,
-            method="GET",
-            url=f"{_TRAKT_SEARCH_URL}/imdb/{imdb_id}",
-            params={"type": type},
-        )
-        results = json.loads(response["body"])
-        if len(results) > 0:
-            logger.debug("https://www.imdb.com/title/%s/ found on Trakt", imdb_id)
-            yield item
-        else:
-            logger.warning("https://www.imdb.com/title/%s/ not found on Trakt", imdb_id)
 
 
 def trakt_ratings(
