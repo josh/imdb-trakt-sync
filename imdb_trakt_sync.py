@@ -11,6 +11,8 @@ from typing import Any, Literal, TypedDict, TypeVar, cast
 
 import click
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 logger = logging.getLogger("imdb-trakt-sync")
 
@@ -443,6 +445,15 @@ def trakt_session(client_id: str, access_token: str) -> requests.Session:
     session.headers.update(_TRAKT_API_HEADERS)
     session.headers["trakt-api-key"] = client_id
     session.headers["Authorization"] = f"Bearer {access_token}"
+
+    retry_strategy = Retry(
+        total=5,
+        backoff_factor=2,
+        status_forcelist=[429, 500, 502, 503, 504],
+    )
+    adapter = HTTPAdapter(max_retries=retry_strategy)
+    session.mount("https://api.trakt.tv", adapter)
+
     return session
 
 
