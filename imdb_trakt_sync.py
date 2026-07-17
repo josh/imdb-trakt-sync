@@ -900,7 +900,7 @@ def trakt_add_history(
         added: int = result["added"][media_type]
         not_found: list[TraktAnyItem] = result["not_found"][media_type]
         if added > 0:
-            logger.info("Added %d %s to ratings", added, media_type)
+            logger.info("Added %d %s to history", added, media_type)
         if not_found:
             for item in not_found:
                 logger.warning(
