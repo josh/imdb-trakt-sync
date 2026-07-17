@@ -18,27 +18,23 @@ jobs:
 
       - name: Refresh Trakt token
         run: |
-          status=$(curl --silent --show-error \
-              --request POST \
-              --header 'Content-Type: application/json' \
-              --output token.json \
-              --write-out '%{http_code}' \
-              --data @- \
-              'https://api.trakt.tv/oauth/token' <<EOF
-          {
-            "client_id": "$TRAKT_CLIENT_ID",
-            "client_secret": "$TRAKT_CLIENT_SECRET",
-            "refresh_token": "$TRAKT_REFRESH_TOKEN",
-            "grant_type": "refresh_token"
-          }
-          EOF
-          )
+          set -o pipefail
 
-          if [ "$status" -lt 200 ] || [ "$status" -ge 300 ]; then
-            echo "Trakt token refresh failed with HTTP $status" >&2
-            jq --raw-output '.error_description // .error // .' token.json >&2
-            exit 1
-          fi
+          jq --null-input \
+              --arg client_id "$TRAKT_CLIENT_ID" \
+              --arg client_secret "$TRAKT_CLIENT_SECRET" \
+              --arg refresh_token "$TRAKT_REFRESH_TOKEN" \
+              '{
+                client_id: $client_id,
+                client_secret: $client_secret,
+                refresh_token: $refresh_token,
+                grant_type: "refresh_token"
+              }' \
+            | curl --silent --show-error --fail-with-body \
+                --request POST \
+                --header 'Content-Type: application/json' \
+                --data-binary @- \
+                'https://api.trakt.tv/oauth/token' >token.json
 
           jq --exit-status '.access_token and .refresh_token' token.json >/dev/null
         env:
