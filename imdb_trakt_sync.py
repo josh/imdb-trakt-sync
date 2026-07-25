@@ -84,6 +84,7 @@ def sync_watchlist(
     dry_run: bool,
 ) -> None:
     items = fetch_imdb_watchlist(imdb_watchlist_url)
+    imdb_titles = {item["imdb_id"]: item["title"] for item in items}
 
     existing_media_items = list(trakt_watchlist(session))
     existing_movie_imdb_ids: set[str] = _compact_set(
@@ -124,8 +125,16 @@ def sync_watchlist(
         remove_movies = list(_block_watching_items(remove_movies, watching_item))
         remove_shows = list(_block_watching_items(remove_shows, watching_item))
 
-    add_movies = list(_filter_unknown_imdb_ids(session, add_movies, type="movie"))
-    add_shows = list(_filter_unknown_imdb_ids(session, add_shows, type="show"))
+    add_movies = list(
+        _filter_unknown_imdb_ids(
+            session, add_movies, type="movie", imdb_titles=imdb_titles
+        )
+    )
+    add_shows = list(
+        _filter_unknown_imdb_ids(
+            session, add_shows, type="show", imdb_titles=imdb_titles
+        )
+    )
 
     trakt_update_watchlist(
         session,
@@ -159,6 +168,7 @@ def sync_ratings(
     dry_run: bool,
 ) -> None:
     imdb_ratings = fetch_imdb_ratings(imdb_ratings_url)
+    imdb_titles = {item["imdb_id"]: item["title"] for item in imdb_ratings}
 
     trakt_rated_at: dict[str, datetime] = {}
     trakt_rated: dict[str, int] = {}
@@ -220,8 +230,16 @@ def sync_ratings(
             trakt_rated_at[imdb_id],
         )
 
-    add_movies = list(_filter_unknown_imdb_ids(session, add_movies, type="movie"))
-    add_shows = list(_filter_unknown_imdb_ids(session, add_shows, type="show"))
+    add_movies = list(
+        _filter_unknown_imdb_ids(
+            session, add_movies, type="movie", imdb_titles=imdb_titles
+        )
+    )
+    add_shows = list(
+        _filter_unknown_imdb_ids(
+            session, add_shows, type="show", imdb_titles=imdb_titles
+        )
+    )
 
     trakt_add_ratings(
         session=session,
@@ -252,11 +270,13 @@ def sync_history(
     existing_episodes_imdb_ids: set[str] = set()
 
     imdb_id_rated_at: dict[str, date] = {}
+    imdb_titles: dict[str, str] = {}
     imdb_movie_ids: set[str] = set()
     imdb_episode_ids: set[str] = set()
 
     for imdb_item in fetch_imdb_ratings(imdb_ratings_url):
         imdb_id_rated_at[imdb_item["imdb_id"]] = imdb_item["rated_on"]
+        imdb_titles[imdb_item["imdb_id"]] = imdb_item["title"]
         if imdb_item["trakt_type"] == "movie":
             imdb_movie_ids.add(imdb_item["imdb_id"])
         elif imdb_item["trakt_type"] == "episode":
@@ -288,8 +308,16 @@ def sync_history(
             list(_block_watching_items(add_episodes, watching_item)),
         )
 
-    add_movies = list(_filter_unknown_imdb_ids(session, add_movies, type="movie"))
-    add_episodes = list(_filter_unknown_imdb_ids(session, add_episodes, type="episode"))
+    add_movies = list(
+        _filter_unknown_imdb_ids(
+            session, add_movies, type="movie", imdb_titles=imdb_titles
+        )
+    )
+    add_episodes = list(
+        _filter_unknown_imdb_ids(
+            session, add_episodes, type="episode", imdb_titles=imdb_titles
+        )
+    )
 
     trakt_add_history(
         session,
@@ -301,11 +329,13 @@ def sync_history(
 
 class IMDBWatchlistItem(TypedDict):
     imdb_id: str
+    title: str
     trakt_type: Literal["movie", "show", "episode"]
 
 
 class IMDBRatingItem(TypedDict):
     imdb_id: str
+    title: str
     rating: int
     rated_on: date
     trakt_type: Literal["movie", "show", "episode"]
@@ -325,7 +355,9 @@ def fetch_imdb_watchlist(url: str) -> list[IMDBWatchlistItem]:
             trakt_type = "show"
         assert trakt_type, f"Unknown IMDB Title Type: {row['Title Type']}"
 
-        items.append({"imdb_id": imdb_id, "trakt_type": trakt_type})
+        items.append(
+            {"imdb_id": imdb_id, "title": row["Title"], "trakt_type": trakt_type}
+        )
 
     return items
 
@@ -350,6 +382,7 @@ def fetch_imdb_ratings(url: str) -> list[IMDBRatingItem]:
         items.append(
             {
                 "imdb_id": imdb_id,
+                "title": row["Title"],
                 "rating": rating,
                 "rated_on": rated_on,
                 "trakt_type": trakt_type,
@@ -729,6 +762,7 @@ def _filter_unknown_imdb_ids(
     session: TraktSession,
     items: Iterable[T_TraktAnyItem],
     type: Literal["movie", "show", "episode"],
+    imdb_titles: dict[str, str],
 ) -> Iterator[T_TraktAnyItem]:
     for item in items:
         imdb_id = item["ids"]["imdb"]
@@ -744,9 +778,10 @@ def _filter_unknown_imdb_ids(
             yield item
         else:
             logger.warning(
-                "Skipping https://www.imdb.com/title/%s/ (%s) — not in Trakt's catalog",
-                imdb_id,
+                "Skipping %s '%s' https://www.imdb.com/title/%s/ not found on Trakt",
                 type,
+                imdb_titles.get(imdb_id, imdb_id),
+                imdb_id,
             )
 
 
