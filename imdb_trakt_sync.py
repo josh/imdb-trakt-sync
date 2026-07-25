@@ -743,7 +743,11 @@ def _filter_unknown_imdb_ids(
             logger.debug("https://www.imdb.com/title/%s/ found on Trakt", imdb_id)
             yield item
         else:
-            logger.warning("https://www.imdb.com/title/%s/ not found on Trakt", imdb_id)
+            logger.warning(
+                "Skipping https://www.imdb.com/title/%s/ (%s) — not in Trakt's catalog",
+                imdb_id,
+                type,
+            )
 
 
 def trakt_ratings(
