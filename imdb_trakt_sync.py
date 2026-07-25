@@ -950,6 +950,7 @@ if os.environ.get("GITHUB_ACTIONS") == "true":
     handler = logging.StreamHandler(sys.stderr)
     handler.setFormatter(GitHubActionsFormatter())
     logger.addHandler(handler)
+    logger.propagate = False
 
 
 if __name__ == "__main__":
