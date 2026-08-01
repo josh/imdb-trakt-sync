@@ -6,7 +6,7 @@ import sys
 import urllib.error
 import urllib.parse
 import urllib.request
-from collections.abc import Iterable, Iterator
+from collections.abc import Iterable, Iterator, Sequence
 from datetime import date, datetime, time
 from http.client import HTTPMessage
 from importlib.metadata import version
@@ -20,7 +20,8 @@ logger = logging.getLogger("imdb-trakt-sync")
 
 _VERSION = version("imdb-trakt-sync")
 
-_NOW: datetime = datetime.now()
+# Naive local time, to compare against naive IMDb rating timestamps
+_NOW: datetime = datetime.now().astimezone().replace(tzinfo=None)
 _END_OF_DAY_TIME: time = time(hour=23, minute=59, second=59)
 
 _IMDB_MOVIE_TYPES: set[str] = {"Movie", "Short", "TV Movie", "TV Special", "Video"}
@@ -370,7 +371,7 @@ def fetch_imdb_ratings(url: str) -> list[IMDBRatingItem]:
         assert imdb_id.startswith("tt"), f"Invalid IMDb ID: {imdb_id}"
 
         rating = int(row["Your Rating"])
-        rated_on: date = datetime.strptime(row["Date Rated"], "%Y-%m-%d")
+        rated_on: date = datetime.fromisoformat(row["Date Rated"])
 
         trakt_type: Literal["movie", "show", "episode"] | None = None
         if row["Title Type"] in _IMDB_MOVIE_TYPES:
@@ -609,10 +610,10 @@ def trakt_watchlist(session: TraktSession) -> Iterator[TraktWatchlistItem]:
 
 def trakt_update_watchlist(
     session: TraktSession,
-    movies: list[TraktAnyItem] = [],
-    shows: list[TraktAnyItem] = [],
-    seasons: list[TraktAnyItem] = [],
-    episodes: list[TraktAnyItem] = [],
+    movies: Sequence[TraktAnyItem] = (),
+    shows: Sequence[TraktAnyItem] = (),
+    seasons: Sequence[TraktAnyItem] = (),
+    episodes: Sequence[TraktAnyItem] = (),
     dry_run: bool = False,
 ) -> None:
     if not movies and not shows and not seasons and not episodes:
@@ -661,10 +662,10 @@ def trakt_update_watchlist(
 
 def trakt_remove_from_watchlist(
     session: TraktSession,
-    movies: list[TraktAnyItem] = [],
-    shows: list[TraktAnyItem] = [],
-    seasons: list[TraktAnyItem] = [],
-    episodes: list[TraktAnyItem] = [],
+    movies: Sequence[TraktAnyItem] = (),
+    shows: Sequence[TraktAnyItem] = (),
+    seasons: Sequence[TraktAnyItem] = (),
+    episodes: Sequence[TraktAnyItem] = (),
     dry_run: bool = False,
 ) -> None:
     if not movies and not shows and not seasons and not episodes:
@@ -799,10 +800,10 @@ def trakt_ratings(
 
 def trakt_add_ratings(
     session: TraktSession,
-    movies: list[TraktRatedItem] = [],
-    shows: list[TraktRatedItem] = [],
-    seasons: list[TraktRatedItem] = [],
-    episodes: list[TraktRatedItem] = [],
+    movies: Sequence[TraktRatedItem] = (),
+    shows: Sequence[TraktRatedItem] = (),
+    seasons: Sequence[TraktRatedItem] = (),
+    episodes: Sequence[TraktRatedItem] = (),
     dry_run: bool = False,
 ) -> None:
     if not movies and not shows and not seasons and not episodes:
@@ -848,10 +849,10 @@ def trakt_add_ratings(
 
 def trakt_remove_ratings(
     session: TraktSession,
-    movies: list[TraktRatedItem] = [],
-    shows: list[TraktRatedItem] = [],
-    seasons: list[TraktRatedItem] = [],
-    episodes: list[TraktRatedItem] = [],
+    movies: Sequence[TraktRatedItem] = (),
+    shows: Sequence[TraktRatedItem] = (),
+    seasons: Sequence[TraktRatedItem] = (),
+    episodes: Sequence[TraktRatedItem] = (),
 ) -> None:
     if not movies and not shows and not seasons and not episodes:
         logger.debug("No items to remove")
@@ -901,10 +902,10 @@ def trakt_history(
 
 def trakt_add_history(
     session: TraktSession,
-    movies: list[TraktWatchedItem] = [],
-    shows: list[TraktWatchedItem] = [],
-    seasons: list[TraktWatchedItem] = [],
-    episodes: list[TraktWatchedItem] = [],
+    movies: Sequence[TraktWatchedItem] = (),
+    shows: Sequence[TraktWatchedItem] = (),
+    seasons: Sequence[TraktWatchedItem] = (),
+    episodes: Sequence[TraktWatchedItem] = (),
     dry_run: bool = False,
 ) -> None:
     if not movies and not shows and not seasons and not episodes:
