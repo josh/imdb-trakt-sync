@@ -578,6 +578,7 @@ def trakt_request_paginated(
     limit: int,
 ) -> Iterator[Any]:
     page = 1
+    fetched = 0
 
     while True:
         response = trakt_request(
@@ -590,13 +591,25 @@ def trakt_request_paginated(
             },
         )
 
-        yield from json.loads(response["body"])
+        items = json.loads(response["body"])
+        fetched += len(items)
+        yield from items
 
         page_count_header = response["headers"].get("X-Pagination-Page-Count")
         page_count = int(page_count_header) if page_count_header else page
         if page >= page_count:
             break
         page += 1
+
+    item_count_header = response["headers"].get("X-Pagination-Item-Count")
+    # Trakt over-reports X-Pagination-Item-Count by one on some endpoints
+    if item_count_header and fetched < int(item_count_header) - 1:
+        logger.warning(
+            "Fetched %d of %s items from %s, results may be incomplete",
+            fetched,
+            item_count_header,
+            url,
+        )
 
 
 def trakt_watchlist(session: TraktSession) -> Iterator[TraktWatchlistItem]:
