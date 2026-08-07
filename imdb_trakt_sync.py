@@ -26,7 +26,8 @@ _END_OF_DAY_TIME: time = time(hour=23, minute=59, second=59)
 
 _IMDB_MOVIE_TYPES: set[str] = {"Movie", "Short", "TV Movie", "TV Special", "Video"}
 _IMDB_SHOW_TYPES: set[str] = {"TV Series", "TV Mini Series"}
-_IMDB_TYPES: set[str] = _IMDB_MOVIE_TYPES | _IMDB_SHOW_TYPES
+_IMDB_EPISODE_TYPES: set[str] = {"TV Episode"}
+_IMDB_TYPES: set[str] = _IMDB_MOVIE_TYPES | _IMDB_SHOW_TYPES | _IMDB_EPISODE_TYPES
 
 
 class TraktSession(TypedDict):
@@ -98,12 +99,20 @@ def sync_watchlist(
         for item in existing_media_items
         if item["type"] == "show"
     )
+    existing_episode_imdb_ids: set[str] = _compact_set(
+        _trakt_mediaitem_imdb_id(item)
+        for item in existing_media_items
+        if item["type"] == "episode"
+    )
 
     imdb_movie_ids: set[str] = {
         item["imdb_id"] for item in items if item["trakt_type"] == "movie"
     }
     imdb_show_ids: set[str] = {
         item["imdb_id"] for item in items if item["trakt_type"] == "show"
+    }
+    imdb_episode_ids: set[str] = {
+        item["imdb_id"] for item in items if item["trakt_type"] == "episode"
     }
 
     add_movies: list[TraktAnyItem] = [
@@ -118,13 +127,21 @@ def sync_watchlist(
     remove_shows: list[TraktAnyItem] = [
         {"ids": {"imdb": imdb}} for imdb in existing_show_imdb_ids - imdb_show_ids
     ]
+    add_episodes: list[TraktAnyItem] = [
+        {"ids": {"imdb": imdb}} for imdb in imdb_episode_ids - existing_episode_imdb_ids
+    ]
+    remove_episodes: list[TraktAnyItem] = [
+        {"ids": {"imdb": imdb}} for imdb in existing_episode_imdb_ids - imdb_episode_ids
+    ]
 
     if watching_item := trakt_watching(session):
         logger.debug("Filtering out currently watching...")
         add_movies = list(_block_watching_items(add_movies, watching_item))
         add_shows = list(_block_watching_items(add_shows, watching_item))
+        add_episodes = list(_block_watching_items(add_episodes, watching_item))
         remove_movies = list(_block_watching_items(remove_movies, watching_item))
         remove_shows = list(_block_watching_items(remove_shows, watching_item))
+        remove_episodes = list(_block_watching_items(remove_episodes, watching_item))
 
     add_movies = list(
         _filter_unknown_imdb_ids(
@@ -136,17 +153,24 @@ def sync_watchlist(
             session, add_shows, type="show", imdb_titles=imdb_titles
         )
     )
+    add_episodes = list(
+        _filter_unknown_imdb_ids(
+            session, add_episodes, type="episode", imdb_titles=imdb_titles
+        )
+    )
 
     trakt_update_watchlist(
         session,
         movies=add_movies,
         shows=add_shows,
+        episodes=add_episodes,
         dry_run=dry_run,
     )
     trakt_remove_from_watchlist(
         session,
         movies=remove_movies,
         shows=remove_shows,
+        episodes=remove_episodes,
         dry_run=dry_run,
     )
 
@@ -177,6 +201,7 @@ def sync_ratings(
 
     add_movies: list[TraktRatedItem] = []
     add_shows: list[TraktRatedItem] = []
+    add_episodes: list[TraktRatedItem] = []
 
     for item in trakt_ratings(session, media_type="all"):
         if imdb_id := _trakt_mediaitem_imdb_id(item):
@@ -221,6 +246,8 @@ def sync_ratings(
                 add_movies.append(rated_item)
             elif imdb_rating["trakt_type"] == "show":
                 add_shows.append(rated_item)
+            elif imdb_rating["trakt_type"] == "episode":
+                add_episodes.append(rated_item)
 
     not_rated_on_imdb = set(trakt_rated.keys()) - set(imdb_rated.keys())
     for imdb_id in not_rated_on_imdb:
@@ -241,11 +268,17 @@ def sync_ratings(
             session, add_shows, type="show", imdb_titles=imdb_titles
         )
     )
+    add_episodes = list(
+        _filter_unknown_imdb_ids(
+            session, add_episodes, type="episode", imdb_titles=imdb_titles
+        )
+    )
 
     trakt_add_ratings(
         session=session,
         movies=add_movies,
         shows=add_shows,
+        episodes=add_episodes,
         dry_run=dry_run,
     )
 
@@ -354,6 +387,8 @@ def fetch_imdb_watchlist(url: str) -> list[IMDBWatchlistItem]:
             trakt_type = "movie"
         elif row["Title Type"] in _IMDB_SHOW_TYPES:
             trakt_type = "show"
+        elif row["Title Type"] in _IMDB_EPISODE_TYPES:
+            trakt_type = "episode"
         assert trakt_type, f"Unknown IMDB Title Type: {row['Title Type']}"
 
         items.append(
@@ -378,6 +413,8 @@ def fetch_imdb_ratings(url: str) -> list[IMDBRatingItem]:
             trakt_type = "movie"
         elif row["Title Type"] in _IMDB_SHOW_TYPES:
             trakt_type = "show"
+        elif row["Title Type"] in _IMDB_EPISODE_TYPES:
+            trakt_type = "episode"
         assert trakt_type, f"Unknown IMDB Title Type: {row['Title Type']}"
 
         items.append(
