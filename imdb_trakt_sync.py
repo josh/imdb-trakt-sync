@@ -12,7 +12,7 @@ from http.client import HTTPMessage
 from importlib.metadata import version
 from pathlib import Path
 from time import sleep
-from typing import Any, Literal, TypedDict, TypeVar, cast
+from typing import Any, Literal, TypedDict, cast
 
 import click
 
@@ -769,10 +769,7 @@ def _block_watching_items(
             yield item
 
 
-T_TraktAnyItem = TypeVar("T_TraktAnyItem", bound=TraktAnyItem)
-
-
-def _filter_unknown_imdb_ids(
+def _filter_unknown_imdb_ids[T_TraktAnyItem: TraktAnyItem](
     session: TraktSession,
     items: Iterable[T_TraktAnyItem],
     type: Literal["movie", "show", "episode"],
