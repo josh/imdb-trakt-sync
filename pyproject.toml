@@ -26,7 +26,7 @@ scripts.imdb-trakt-sync = "imdb_trakt_sync:main"
 
 [dependency-groups]
 dev = [
-    "mypy>=1,<2",
+    "mypy>=1.12,<2",
     "ruff>=0.5,<2",
 ]
 
