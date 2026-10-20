@@ -213,7 +213,7 @@ def sync_ratings(
 
         if should_rate:
             rated_item: TraktRatedItem = {
-                "rated_at": title_rated_at.isoformat(),
+                "rated_at": _trakt_timestamp(title_rated_at),
                 "rating": imdb_rating["rating"],
                 "ids": {"imdb": imdb_rating["imdb_id"]},
             }
@@ -290,11 +290,21 @@ def sync_history(
             existing_episodes_imdb_ids.add(trakt_item["episode"]["ids"]["imdb"])
 
     add_movies: list[TraktWatchedItem] = [
-        {"watched_at": imdb_id_rated_at[imdb].isoformat(), "ids": {"imdb": imdb}}
+        {
+            "watched_at": _trakt_timestamp(
+                datetime.combine(imdb_id_rated_at[imdb], time())
+            ),
+            "ids": {"imdb": imdb},
+        }
         for imdb in imdb_movie_ids - existing_movie_imdb_ids
     ]
     add_episodes: list[TraktWatchedItem] = [
-        {"watched_at": imdb_id_rated_at[imdb].isoformat(), "ids": {"imdb": imdb}}
+        {
+            "watched_at": _trakt_timestamp(
+                datetime.combine(imdb_id_rated_at[imdb], time())
+            ),
+            "ids": {"imdb": imdb},
+        }
         for imdb in imdb_episode_ids - existing_episodes_imdb_ids
     ]
 
@@ -979,6 +989,10 @@ def _compact_set(s: Iterable[str | None]) -> set[str]:
 def _fromisoformat(s: str) -> datetime:
     assert s.endswith("Z")
     return datetime.fromisoformat(s[:-1])
+
+
+def _trakt_timestamp(dt: datetime) -> str:
+    return dt.strftime("%Y-%m-%dT%H:%M:%S.000Z")
 
 
 class GitHubActionsFormatter(logging.Formatter):
